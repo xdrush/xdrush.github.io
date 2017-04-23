@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="读书笔记," />
+  <meta name="keywords" content="Machine Learning," />
 
 
 
@@ -84,16 +84,39 @@
 
 
 
-<meta name="description" content="算是完完整整读的第一本人物传记了，一直以来比较不屑于读人物传记，主要还是觉得传记之类无非鸡汤而已，总是在看别人的成功故事。“看了那么多成功学的书，依旧得不到成功的一生”，哈哈。">
+<meta name="description" content="1、传统的验证方法机器学习中数据是十分重要的资源，先来看看传统的验证方法，传统的验证方法大概分为4步：
+第一步将所有样本分为训练数据和测试数据两部分，假设训练数据占70%，测试数据占30%。训练数据用于训练模型，测试数据用来测试模型性能。
+第二步在给定超参数下，用70%的训练数据得到模型。
+第三步用剩下的30%测试数据测试严重上述二中得到的模型。
+第四步为了不浪费数据，再将所有100%的数据来验证">
 <meta property="og:type" content="article">
-<meta property="og:title" content="读书笔记之《特斯拉之父：埃隆·马斯克传》">
-<meta property="og:url" content="https://xdrush.github.io/2017/04/19/读书笔记之《特斯拉之父：埃隆·马斯克传》/index.html">
+<meta property="og:title" content="机器学习之交叉验证">
+<meta property="og:url" content="https://xdrush.github.io/2017/04/13/机器学习之交叉验证/index.html">
 <meta property="og:site_name" content="XDRush">
-<meta property="og:description" content="算是完完整整读的第一本人物传记了，一直以来比较不屑于读人物传记，主要还是觉得传记之类无非鸡汤而已，总是在看别人的成功故事。“看了那么多成功学的书，依旧得不到成功的一生”，哈哈。">
-<meta property="og:updated_time" content="2017-04-19T06:30:24.000Z">
+<meta property="og:description" content="1、传统的验证方法机器学习中数据是十分重要的资源，先来看看传统的验证方法，传统的验证方法大概分为4步：
+第一步将所有样本分为训练数据和测试数据两部分，假设训练数据占70%，测试数据占30%。训练数据用于训练模型，测试数据用来测试模型性能。
+第二步在给定超参数下，用70%的训练数据得到模型。
+第三步用剩下的30%测试数据测试严重上述二中得到的模型。
+第四步为了不浪费数据，再将所有100%的数据来验证">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/traditional_validation_step1.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/traditional_validation_step2.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/traditional_validation_step3.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/traditional_validation_step4.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/cross_validation_step1.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/cross_validation_step2.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/cross_validation_step3.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/cross_validation_step4.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/cross_validation_step5.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/cross_validation_step6.png">
+<meta property="og:updated_time" content="2017-04-23T07:48:12.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="读书笔记之《特斯拉之父：埃隆·马斯克传》">
-<meta name="twitter:description" content="算是完完整整读的第一本人物传记了，一直以来比较不屑于读人物传记，主要还是觉得传记之类无非鸡汤而已，总是在看别人的成功故事。“看了那么多成功学的书，依旧得不到成功的一生”，哈哈。">
+<meta name="twitter:title" content="机器学习之交叉验证">
+<meta name="twitter:description" content="1、传统的验证方法机器学习中数据是十分重要的资源，先来看看传统的验证方法，传统的验证方法大概分为4步：
+第一步将所有样本分为训练数据和测试数据两部分，假设训练数据占70%，测试数据占30%。训练数据用于训练模型，测试数据用来测试模型性能。
+第二步在给定超参数下，用70%的训练数据得到模型。
+第三步用剩下的30%测试数据测试严重上述二中得到的模型。
+第四步为了不浪费数据，再将所有100%的数据来验证">
+<meta name="twitter:image" content="http://7xtapc.com2.z0.glb.clouddn.com/traditional_validation_step1.png">
 
 
 
@@ -121,13 +144,13 @@
 
 
 
-  <link rel="canonical" href="https://xdrush.github.io/2017/04/19/读书笔记之《特斯拉之父：埃隆·马斯克传》/"/>
+  <link rel="canonical" href="https://xdrush.github.io/2017/04/13/机器学习之交叉验证/"/>
 
 
 
 
 
-  <title> 读书笔记之《特斯拉之父：埃隆·马斯克传》 | XDRush </title>
+  <title> 机器学习之交叉验证 | XDRush </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -263,7 +286,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xdrush.github.io/2017/04/19/读书笔记之《特斯拉之父：埃隆·马斯克传》/">
+  <link itemprop="mainEntityOfPage" href="https://xdrush.github.io/2017/04/13/机器学习之交叉验证/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="Dong Xu">
@@ -287,7 +310,7 @@
             
             
               
-                读书笔记之《特斯拉之父：埃隆·马斯克传》
+                机器学习之交叉验证
               
             
           </h1>
@@ -302,8 +325,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-19T14:24:39+08:00">
-                2017-04-19
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-13T15:47:39+08:00">
+                2017-04-13
               </time>
             
 
@@ -321,8 +344,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2017/04/19/读书笔记之《特斯拉之父：埃隆·马斯克传》/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/04/19/读书笔记之《特斯拉之父：埃隆·马斯克传》/" itemprop="commentCount"></span>
+                <a href="/2017/04/13/机器学习之交叉验证/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/04/13/机器学习之交叉验证/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -348,43 +371,20 @@
       
 
       
-        <p>算是完完整整读的第一本人物传记了，一直以来比较不屑于读人物传记，主要还是觉得传记之类无非鸡汤而已，总是在看别人的成功故事。“看了那么多成功学的书，依旧得不到成功的一生”，哈哈。<br><a id="more"></a></p>
-<p>无意在《网易蜗牛读书》上看到了这本书，想着之前在看书时不少因为内容枯燥而不了了之，何不尝试下简单轻松的书看看呢？遂有此篇！</p>
-<h1 id="摘录"><a href="#摘录" class="headerlink" title="摘录"></a>摘录</h1><ul>
-<li><p>总之，说大话的人很难着眼于微小之处；相反，过于自卑而不敢做大事的人，往往目光不够长远。因此，如果一个经营者既能说出前人不敢说也没有想过的话，又能注意到细节，那么，他就有可能成为一个真正的成功者。</p>
-</li>
-<li><p>太空探索技术公司以出人意料的低成本制造火箭并获得了成功，但是对于成功的秘诀，埃隆解释道：”<strong>我们并不是通过革命性的突破取得成功，而是通过孜孜不倦、脚踏实地的努力才取得了今天的成果。</strong>”埃隆对太空探索技术公司的”武器“夸耀似的强调说：”我们‘降低成本’的想法本身，就是一种革命性的突破。“</p>
-</li>
-<li><p>说出自己的目标并不是件难事，或许还非常简单。就像有些公司往往会给自己设定一个很难达到的目标，为了使股价上升，先说一些豪言壮语。但这种公司的领导者一旦开始行动就会想：“这看起来好像不可能完成啊”，随之懈怠下来，在中途就降低了目标。他们这样做或者是明哲保身，或者是不想让自己的形象印上失败的烙印，畏难和惰性表现得一览无余。但是，领导随意降低目标这种不认真的心态会使员工也没有干劲。</p>
-</li>
-<li><p>正如亨利·福特通过量产汽车来降低制造成本，埃隆则是通过量产火箭来降低成本。（规模效益）</p>
-</li>
-<li><p>21世纪的商业竞争中，仅仅提高单件商品的性能很难获得成功。创造出着眼于整体的、方便的体系才是成功的秘诀。</p>
-</li>
-<li><p>确实，攒钱很难，但更难的是怎样使用攒下的钱。</p>
-</li>
-<li><p>但埃隆通过网络体验到了创新带来的好处，所以他说：“真正的改革是涉足完全不同的领域”。</p>
-</li>
-<li><p>总之，要使前所未有的新产品获得广泛的认可，就应该在媒体报道错误时要求修正，该反驳时进行反驳。否则，人们就会不明所以地相信错误的信息，给企业造成不利影响。成立了多家公司的埃隆深知谣言的害处，因此，今后他会继续反击庞大的对手。</p>
-</li>
-<li><p>一个人想要创造出前所未有的新型产品和服务，若不大力宣扬自己的想法，就不会吸引那些反复无常、懒惰成性的人的注意。所以，开创者就应该使自己的创新引人注目。</p>
-</li>
-<li><p>商界比拼的就是企业对未来的洞察力，如果企业能准确判断未来，并且真正按照自己的判断去发展，那么它的股价就会迅速上涨。</p>
-</li>
-<li><p>如果在地球这个有限的空间内人口不断增多、全球变暖不断加剧、环境继续遭到破坏，人类就不能只在地球上生存了。因此，移居到火星也是一种选择。但是，由于人类还没有制造出能飞往火星的飞船，因此要想在飞船制造出来之前获取更长的生存时间，就应该减少二氧化碳和废气排放，普及电动车和太阳能发电就可以达到这个目的。</p>
-</li>
-<li><p>他也曾偶尔承认，将所有的未来赌在火箭和电动车上很冒险，但他立即话锋一转：“若我不这么投入，才是最大的冒险，因为成功的希望为零。”经历了那段对意志极限的考验后，他总结说：“做企业就像凝视死亡的深渊。”</p>
-</li>
-<li><p>底特律的传统汽车商不熟悉这个领域，特斯拉却抓住了电池这个关键。</p>
-</li>
-</ul>
-<h1 id="感想"><a href="#感想" class="headerlink" title="感想"></a>感想</h1><p>这本书出版时，特斯拉的Model S尚未正式交付给客户，然而今天看来，Model S算得上是特斯拉第二代产品，随着Model X这款超跑SUV和Model 3这款价格亲民的电动汽车的上市，从Model 3预定时一车难求这些种种情形来看，无疑，特斯拉成功啦！</p>
-<p>另一方面，书中描述的“猎鹰-9”火箭，已在近两年多次完成发射和回收，并且给国际空间站多次对接、运输必要的器械和食物，无疑，Space X也成功了！</p>
-<p>不仅如此，连他提出的Hyperloop超高速铁路，几年前被大众称之为骗子，被认为是天方夜谭的项目，如今，也在加州如火如荼的进行着，并且已经成功进行了初步实验，可以预期，Hyperloop也正走在成功的路上。</p>
-<p>埃隆早起在硅谷从事互联网行业的这段经验，对他后来的创新起到了至关重要的作用。在传统汽车行业从业人士思维被禁锢时，来自互联网人敏锐的洞察力和创新精神，帮助埃隆打破思维禁锢，并一步步践行自己的梦想。</p>
-<p>对于梦想的追求，很喜欢这段：<br>“如果在地球这个有限的空间内人口不断增多、全球变暖不断加剧、环境继续遭到破坏，人类就不能只在地球上生存了。因此，移居到火星也是一种选择。但是，由于人类还没有制造出能飞往火星的飞船，因此要想在飞船制造出来之前获取更长的生存时间，就应该减少二氧化碳和废气排放，普及电动车和太阳能发电就可以达到这个目的”。<br>埃隆对于梦想的追求不是一蹴而就的，而是在终极目标无法达到时，退而求其次，曲线救国。有了这个根本宗旨，不至于目标模糊。</p>
-<p>不得不说，埃隆是位真正的梦想家和实践家！</p>
-<p>与我而言，得走在正确的路上，脚踏实地的搞点儿事情。</p>
+        <h1 id="1、传统的验证方法"><a href="#1、传统的验证方法" class="headerlink" title="1、传统的验证方法"></a>1、传统的验证方法</h1><p>机器学习中数据是十分重要的资源，先来看看传统的验证方法，传统的验证方法大概分为4步：</p>
+<h2 id="第一步"><a href="#第一步" class="headerlink" title="第一步"></a>第一步</h2><p>将所有样本分为<strong>训练数据</strong>和<strong>测试数据</strong>两部分，假设训练数据占70%，测试数据占30%。训练数据用于训练模型，测试数据用来测试模型性能。<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/traditional_validation_step1.png" alt="传统验证方法步骤一"></p>
+<h2 id="第二步"><a href="#第二步" class="headerlink" title="第二步"></a>第二步</h2><p>在给定超参数下，用70%的训练数据得到模型。<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/traditional_validation_step2.png" alt="传统验证方法步骤二"></p>
+<h2 id="第三步"><a href="#第三步" class="headerlink" title="第三步"></a>第三步</h2><p>用剩下的30%测试数据测试严重上述二中得到的模型。<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/traditional_validation_step3.png" alt="传统验证方法步骤三"></p>
+<h2 id="第四步"><a href="#第四步" class="headerlink" title="第四步"></a>第四步</h2><p>为了不浪费数据，再将所有100%的数据来验证模型，继续修正参数得到最终的模型。<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/traditional_validation_step4.png" alt="传统验证方法步骤四"></p>
+<p>机器学习中数据是最为宝贵的资源的之一，传统的验证方法无法充分利用样本，因此，在传统验证方法基础上，提出了交叉验证思想。</p>
+<h1 id="2、交叉验证"><a href="#2、交叉验证" class="headerlink" title="2、交叉验证"></a>2、交叉验证</h1><p>为使数据得到充分利用，提出了一种优化的交叉验证方法，具体执行步骤如下：</p>
+<h2 id="第一步-1"><a href="#第一步-1" class="headerlink" title="第一步"></a>第一步</h2><p>第一步首先将数据分成3部分，训练集、验证集和测试集，假设各占70%、15%、15%，<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/cross_validation_step1.png" alt="交叉验证步骤一"></p>
+<h2 id="第二步-1"><a href="#第二步-1" class="headerlink" title="第二步"></a>第二步</h2><p>在同一组训练集上，使用若干个不同的超参数，训练得到不同的模型，如图所示，假设3个模型分别为A、B、C。<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/cross_validation_step2.png" alt="交叉验证步骤二"></p>
+<h2 id="第三步-1"><a href="#第三步-1" class="headerlink" title="第三步"></a>第三步</h2><p>在相同的验证集上分别验证上述步骤二中得到的A、B、C，选取最佳超参数所对应的模型。<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/cross_validation_step3.png" alt="交叉验证步骤三"></p>
+<h2 id="第四步-1"><a href="#第四步-1" class="headerlink" title="第四步"></a>第四步</h2><p>在上述三所得到的最优模型基础上，继续用训练集和验证集对模型进行进一步优化，进一步修正模型的参数。<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/cross_validation_step4.png" alt="交叉验证步骤四"></p>
+<h2 id="第五步"><a href="#第五步" class="headerlink" title="第五步"></a>第五步</h2><p>在测试集上测试上述四中得到的模型，通常情况下，这时的模型会比较好。<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/cross_validation_step5.png" alt="交叉验证步骤五"></p>
+<h2 id="第六步"><a href="#第六步" class="headerlink" title="第六步"></a>第六步</h2><p>用所有数据继续训练所得到的模型，就是最终的模型。<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/cross_validation_step6.png" alt="交叉验证步骤六"></p>
+<p>通过上述步骤，能够充分利用训练样本集，得到最优的模型。</p>
 
       
     </div>
@@ -408,7 +408,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/读书笔记/" rel="tag"># 读书笔记</a>
+            <a href="/tags/Machine-Learning/" rel="tag"># Machine Learning</a>
           
         </div>
       
@@ -417,8 +417,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/04/17/Numpy学习笔记/" rel="next" title="Numpy学习笔记">
-                <i class="fa fa-chevron-left"></i> Numpy学习笔记
+              <a href="/2017/01/26/仿斗鱼Android客户端结构实现/" rel="next" title="仿斗鱼Android客户端结构实现">
+                <i class="fa fa-chevron-left"></i> 仿斗鱼Android客户端结构实现
               </a>
             
           </div>
@@ -426,6 +426,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/04/17/Numpy学习笔记/" rel="prev" title="Numpy学习笔记">
+                Numpy学习笔记 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -451,8 +455,8 @@
           
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2017/04/19/读书笔记之《特斯拉之父：埃隆·马斯克传》/"
-           data-title="读书笔记之《特斯拉之父：埃隆·马斯克传》" data-url="https://xdrush.github.io/2017/04/19/读书笔记之《特斯拉之父：埃隆·马斯克传》/">
+      <div class="ds-thread" data-thread-key="2017/04/13/机器学习之交叉验证/"
+           data-title="机器学习之交叉验证" data-url="https://xdrush.github.io/2017/04/13/机器学习之交叉验证/">
       </div>
     
   </div>
@@ -552,7 +556,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#摘录"><span class="nav-number">1.</span> <span class="nav-text">摘录</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#感想"><span class="nav-number">2.</span> <span class="nav-text">感想</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1、传统的验证方法"><span class="nav-number">1.</span> <span class="nav-text">1、传统的验证方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#第一步"><span class="nav-number">1.1.</span> <span class="nav-text">第一步</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第二步"><span class="nav-number">1.2.</span> <span class="nav-text">第二步</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第三步"><span class="nav-number">1.3.</span> <span class="nav-text">第三步</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第四步"><span class="nav-number">1.4.</span> <span class="nav-text">第四步</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2、交叉验证"><span class="nav-number">2.</span> <span class="nav-text">2、交叉验证</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#第一步-1"><span class="nav-number">2.1.</span> <span class="nav-text">第一步</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第二步-1"><span class="nav-number">2.2.</span> <span class="nav-text">第二步</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第三步-1"><span class="nav-number">2.3.</span> <span class="nav-text">第三步</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第四步-1"><span class="nav-number">2.4.</span> <span class="nav-text">第四步</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第五步"><span class="nav-number">2.5.</span> <span class="nav-text">第五步</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第六步"><span class="nav-number">2.6.</span> <span class="nav-text">第六步</span></a></li></ol></li></ol></div>
             
 
           </div>
