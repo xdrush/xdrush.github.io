@@ -84,19 +84,17 @@
 
 
 
-<meta name="description" content="背景说明这篇文章可以看作是对MultiDex实践的一篇补充，更进一步的背景是对美团MultiDex实现的一些具体细节的一种实现方式。
-同美团团队一样，在实现MultiDex时，同样遇到一个问题，那就是：部分在classes2.dex中的二级界面，首次启动时，如果classes2.dex尚未加载完，而这时用户操作了该二级界面，Crash！！是必然的！美团的那篇文章也讨论了这个问题，解决方法就是在操作">
+<meta name="description" content="背景说明这篇文章可以看作是对MultiDex实践的一篇补充，更进一步的背景是对美团MultiDex实现的一些具体细节的一种实现方式。 同美团团队一样，在实现MultiDex时，同样遇到一个问题，那就是：部分在classes2.dex中的二级界面，首次启动时，如果classes2.dex尚未加载完，而这时用户操作了该二级界面，Crash！！是必然的！美团的那篇文章也讨论了这个问题，解决方法就是在操作">
+<meta name="keywords" content="Android,RxAndroid,RxJava">
 <meta property="og:type" content="article">
-<meta property="og:title" content="ActivityThread & Instrumentation在MultiDex实现中的应用">
+<meta property="og:title" content="ActivityThread &amp; Instrumentation在MultiDex实现中的应用">
 <meta property="og:url" content="https://xdrush.github.io/2016/04/27/ActivityThread & Instrumentation在MultiDex实现中的应用/index.html">
 <meta property="og:site_name" content="XDRush">
-<meta property="og:description" content="背景说明这篇文章可以看作是对MultiDex实践的一篇补充，更进一步的背景是对美团MultiDex实现的一些具体细节的一种实现方式。
-同美团团队一样，在实现MultiDex时，同样遇到一个问题，那就是：部分在classes2.dex中的二级界面，首次启动时，如果classes2.dex尚未加载完，而这时用户操作了该二级界面，Crash！！是必然的！美团的那篇文章也讨论了这个问题，解决方法就是在操作">
+<meta property="og:description" content="背景说明这篇文章可以看作是对MultiDex实践的一篇补充，更进一步的背景是对美团MultiDex实现的一些具体细节的一种实现方式。 同美团团队一样，在实现MultiDex时，同样遇到一个问题，那就是：部分在classes2.dex中的二级界面，首次启动时，如果classes2.dex尚未加载完，而这时用户操作了该二级界面，Crash！！是必然的！美团的那篇文章也讨论了这个问题，解决方法就是在操作">
 <meta property="og:updated_time" content="2016-11-09T14:44:28.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="ActivityThread & Instrumentation在MultiDex实现中的应用">
-<meta name="twitter:description" content="背景说明这篇文章可以看作是对MultiDex实践的一篇补充，更进一步的背景是对美团MultiDex实现的一些具体细节的一种实现方式。
-同美团团队一样，在实现MultiDex时，同样遇到一个问题，那就是：部分在classes2.dex中的二级界面，首次启动时，如果classes2.dex尚未加载完，而这时用户操作了该二级界面，Crash！！是必然的！美团的那篇文章也讨论了这个问题，解决方法就是在操作">
+<meta name="twitter:title" content="ActivityThread &amp; Instrumentation在MultiDex实现中的应用">
+<meta name="twitter:description" content="背景说明这篇文章可以看作是对MultiDex实践的一篇补充，更进一步的背景是对美团MultiDex实现的一些具体细节的一种实现方式。 同美团团队一样，在实现MultiDex时，同样遇到一个问题，那就是：部分在classes2.dex中的二级界面，首次启动时，如果classes2.dex尚未加载完，而这时用户操作了该二级界面，Crash！！是必然的！美团的那篇文章也讨论了这个问题，解决方法就是在操作">
 
 
 

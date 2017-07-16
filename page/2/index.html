@@ -487,7 +487,7 @@
       
         
           <h1 id="1-Groovy-amp-Gradle基础"><a href="#1-Groovy-amp-Gradle基础" class="headerlink" title="1 Groovy &amp; Gradle基础"></a>1 Groovy &amp; Gradle基础</h1><h2 id="1-1-Groovy"><a href="#1-1-Groovy" class="headerlink" title="1.1 Groovy"></a>1.1 Groovy</h2><p>这里不作介绍，像写脚本一样写Java，也是运行在JVM上。比较简单，是Gradle基础，当然，也可以用纯Java来写gradle。</p>
-<h2 id="1-2-Gradle"><a href="#1-2-Gradle" class="headerlink" title="1.2 Gradle"></a>1.2 Gradle</h2><p>Gradle是一个工具，同时它也是一个编程框架。使用这个工具可以完成app的编译打包等工作，当然也可以用它干其他的事情。Gradle相关文档<a href="https://docs.gradle.org/current/javadoc/org/gradle/api/Project.html">见这里</a>，我们编写所谓的编译脚本，其实就是在用Gradle提供的API。<br>
+<h2 id="1-2-Gradle"><a href="#1-2-Gradle" class="headerlink" title="1.2 Gradle"></a>1.2 Gradle</h2><p>Gradle是一个工具，同时它也是一个编程框架。使用这个工具可以完成app的编译打包等工作，当然也可以用它干其他的事情。Gradle相关文档<a href="https://docs.gradle.org/current/javadoc/org/gradle/api/Project.html" target="_blank" rel="external">见这里</a>，我们编写所谓的编译脚本，其实就是在用Gradle提供的API。<br>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2017/01/17/一篇文章带你了解Android之Gradle/#more" rel="contents">
@@ -1092,7 +1092,7 @@
 
       
         
-          <h2 id="背景说明"><a href="#背景说明" class="headerlink" title="背景说明"></a>背景说明</h2><p>这篇文章可以看作是对<a href="http://xdrush.github.io/2016/04/17/MultiDex%E5%AE%9E%E8%B7%B5/">MultiDex实践</a>的一篇补充，更进一步的背景是对<a href="http://tech.meituan.com/mt-android-auto-split-dex.html">美团MultiDex实现</a>的一些具体细节的一种实现方式。</p>
+          <h2 id="背景说明"><a href="#背景说明" class="headerlink" title="背景说明"></a>背景说明</h2><p>这篇文章可以看作是对<a href="http://xdrush.github.io/2016/04/17/MultiDex%E5%AE%9E%E8%B7%B5/">MultiDex实践</a>的一篇补充，更进一步的背景是对<a href="http://tech.meituan.com/mt-android-auto-split-dex.html" target="_blank" rel="external">美团MultiDex实现</a>的一些具体细节的一种实现方式。</p>
 <p>同美团团队一样，在实现MultiDex时，同样遇到一个问题，那就是：部分在classes2.dex中的二级界面，首次启动时，如果classes2.dex尚未加载完，而这时用户操作了该二级界面，Crash！！是必然的！美团的那篇文章也讨论了这个问题，解决方法就是在操作二级界面Activity时，首先判断classes2.dex是否加载完毕，如果加载完毕，则直接启动该Activity，如果尚未加载完毕，则引入一个WaitActivity，在WaitActivity中阻塞等待classes2.dex加载完成，等dex2加载完毕之后再启动该二级界面Activity。</p>
 <p>这么做肯定是没有问题的，但有一点就是，如果二级界面太多，每个调用的地方都去判断dex2是否加载完未免太麻烦，好在Framework告诉了我们答案！我们知道Activity是由ActivityThread通过Instrumentation来启动的，再进一步跟进去，我们发现ActivityThread中有一个mInstrumentation对象，该对象即是Instrumentation，进一步查看Instrumentation源码，发现其与Activity启动相关的方法有以下几个：execStartActivity, newActivity等等，于是，我们就可以在这里面做些手脚！怎么做？修改Instrumentation或者ActivityThread也未免显得太过幼稚了！那么How？<br>
           <!--noindex-->
@@ -1253,7 +1253,7 @@
 <ol>
 <li>插件化</li>
 </ol>
-<p>将应用的非核心功能做成单独的App，实现该App和插件App相关的接口即可，实现以及体验如何，大家不妨来体验下<a href="https://play.google.com/store/apps/details?id=mobi.mgeek.TunnyBrowser&amp;hl=en">Dolphin浏览器</a>（这里做个小广告）。</p>
+<p>将应用的非核心功能做成单独的App，实现该App和插件App相关的接口即可，实现以及体验如何，大家不妨来体验下<a href="https://play.google.com/store/apps/details?id=mobi.mgeek.TunnyBrowser&amp;hl=en" target="_blank" rel="external">Dolphin浏览器</a>（这里做个小广告）。</p>
 <ol>
 <li>MultiDex
           <!--noindex-->
