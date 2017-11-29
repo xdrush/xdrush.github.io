@@ -84,17 +84,17 @@
 
 
 
-<meta name="description" content="Graph理解Tensorflow的程序一般都分为2个阶段，（1）定义计算图中的所有计算；（2）执行计算； 系统默认计算图在tf程序中，系统会自动维护一个默认的计算图，通过tf.get_default_graph()可以获取当前默认的计算图； 1234567a = tf.constant([2, 3], name=&apos;a&apos;)b = tf.constant([4, 5], name=&apos;b&apos;)resul">
+<meta name="description" content="Graph理解Tensorflow的程序一般都分为2个阶段，（1）定义计算图中的所有计算；（2）执行计算； 系统默认计算图在tf程序中，系统会自动维护一个默认的计算图，通过tf.get_default_graph()可以获取当前默认的计算图；">
 <meta name="keywords" content="tensorflow">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Tensorflow使用notes">
 <meta property="og:url" content="https://xdrush.github.io/2016/12/17/Tensorflow使用notes/index.html">
 <meta property="og:site_name" content="XDRush">
-<meta property="og:description" content="Graph理解Tensorflow的程序一般都分为2个阶段，（1）定义计算图中的所有计算；（2）执行计算； 系统默认计算图在tf程序中，系统会自动维护一个默认的计算图，通过tf.get_default_graph()可以获取当前默认的计算图； 1234567a = tf.constant([2, 3], name=&apos;a&apos;)b = tf.constant([4, 5], name=&apos;b&apos;)resul">
-<meta property="og:updated_time" content="2017-11-29T15:35:37.000Z">
+<meta property="og:description" content="Graph理解Tensorflow的程序一般都分为2个阶段，（1）定义计算图中的所有计算；（2）执行计算； 系统默认计算图在tf程序中，系统会自动维护一个默认的计算图，通过tf.get_default_graph()可以获取当前默认的计算图；">
+<meta property="og:updated_time" content="2017-11-29T15:48:29.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Tensorflow使用notes">
-<meta name="twitter:description" content="Graph理解Tensorflow的程序一般都分为2个阶段，（1）定义计算图中的所有计算；（2）执行计算； 系统默认计算图在tf程序中，系统会自动维护一个默认的计算图，通过tf.get_default_graph()可以获取当前默认的计算图； 1234567a = tf.constant([2, 3], name=&apos;a&apos;)b = tf.constant([4, 5], name=&apos;b&apos;)resul">
+<meta name="twitter:description" content="Graph理解Tensorflow的程序一般都分为2个阶段，（1）定义计算图中的所有计算；（2）执行计算； 系统默认计算图在tf程序中，系统会自动维护一个默认的计算图，通过tf.get_default_graph()可以获取当前默认的计算图；">
 
 
 
@@ -351,6 +351,7 @@
       
         <h1 id="Graph理解"><a href="#Graph理解" class="headerlink" title="Graph理解"></a>Graph理解</h1><p>Tensorflow的程序一般都分为2个阶段，（1）定义计算图中的所有计算；（2）执行计算；</p>
 <h2 id="系统默认计算图"><a href="#系统默认计算图" class="headerlink" title="系统默认计算图"></a>系统默认计算图</h2><p>在tf程序中，系统会自动维护一个默认的计算图，通过tf.get_default_graph()可以获取当前默认的计算图；</p>
+<a id="more"></a>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">a = tf.constant([<span class="number">2</span>, <span class="number">3</span>], name=<span class="string">'a'</span>)</div><div class="line">b = tf.constant([<span class="number">4</span>, <span class="number">5</span>], name=<span class="string">'b'</span>)</div><div class="line"></div><div class="line">result = tf.multiply(a, b, name=<span class="string">'result'</span>)</div><div class="line"></div><div class="line"><span class="keyword">print</span> result.graph</div><div class="line"><span class="keyword">print</span> tf.get_default_graph()</div></pre></td></tr></table></figure>
 <p>比如上面这段代码的输出为：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&lt;tensorflow.python.framework.ops.Graph object at <span class="number">0x10eddc2d0</span>&gt;</div><div class="line">&lt;tensorflow.python.framework.ops.Graph object at <span class="number">0x10eddc2d0</span>&gt;</div></pre></td></tr></table></figure></p>
 <p>可以看到，定义的这些节点都在系统默认的计算图中。</p>
