@@ -84,13 +84,13 @@
 
 
 
-<meta name="description" content="背景说明在搜索广告和信息流广告中，除了常说的各种模型的应用之外，还有一块往往被大家所忽视，那就是物料优化，但是广告物料是直接呈现在网民面前的，对这一部分做好了优化工作无疑对广告的点击率/cpm以及用户体验上大有裨益。 物料优化中最重要的两点就是：（1）&amp;lt;关键词，标题&amp;gt;的相关性以及标题质量；（2）&amp;lt;关键词，图&amp;gt;的相关性以及图片质量。当广告库规模较小时，通过运营手段能取得较好的">
+<meta name="description" content="背景说明在搜索广告和信息流广告中，除了常说的各种模型的应用之外，还有一块往往被大家所忽视，那就是物料优化，但是广告物料是直接呈现在网民面前的，对这一部分做好了优化工作无疑对广告的点击率/cpm以及用户体验上大有裨益。">
 <meta name="keywords" content="深度学习">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Attention机制及其在计算广告中的应用">
 <meta property="og:url" content="https://xdrush.github.io/2017/10/23/Attention机制及其在计算广告中的应用/index.html">
 <meta property="og:site_name" content="XDRush">
-<meta property="og:description" content="背景说明在搜索广告和信息流广告中，除了常说的各种模型的应用之外，还有一块往往被大家所忽视，那就是物料优化，但是广告物料是直接呈现在网民面前的，对这一部分做好了优化工作无疑对广告的点击率/cpm以及用户体验上大有裨益。 物料优化中最重要的两点就是：（1）&amp;lt;关键词，标题&amp;gt;的相关性以及标题质量；（2）&amp;lt;关键词，图&amp;gt;的相关性以及图片质量。当广告库规模较小时，通过运营手段能取得较好的">
+<meta property="og:description" content="背景说明在搜索广告和信息流广告中，除了常说的各种模型的应用之外，还有一块往往被大家所忽视，那就是物料优化，但是广告物料是直接呈现在网民面前的，对这一部分做好了优化工作无疑对广告的点击率/cpm以及用户体验上大有裨益。">
 <meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/%E4%BA%BA%E7%B1%BB%E7%9A%84%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6.png">
 <meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/Encoder-Decoder%E6%A1%86%E6%9E%B6.png">
 <meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/source-target.png">
@@ -134,10 +134,10 @@
 <meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/%E7%9C%8B%E5%9B%BE%E8%AF%B4%E8%AF%9D-soft%E7%9B%AE%E6%A0%87%E5%87%BD%E6%95%B0.png">
 <meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/%E7%9C%8B%E5%9B%BE%E8%AF%B4%E8%AF%9D-%E5%85%B7%E4%BD%93%E5%BA%94%E7%94%A801.png">
 <meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/%E7%9C%8B%E5%9B%BE%E8%AF%B4%E8%AF%9D-%E5%85%B7%E4%BD%93%E5%BA%94%E7%94%A802.png">
-<meta property="og:updated_time" content="2017-12-10T07:28:12.000Z">
+<meta property="og:updated_time" content="2017-12-10T07:31:30.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Attention机制及其在计算广告中的应用">
-<meta name="twitter:description" content="背景说明在搜索广告和信息流广告中，除了常说的各种模型的应用之外，还有一块往往被大家所忽视，那就是物料优化，但是广告物料是直接呈现在网民面前的，对这一部分做好了优化工作无疑对广告的点击率/cpm以及用户体验上大有裨益。 物料优化中最重要的两点就是：（1）&amp;lt;关键词，标题&amp;gt;的相关性以及标题质量；（2）&amp;lt;关键词，图&amp;gt;的相关性以及图片质量。当广告库规模较小时，通过运营手段能取得较好的">
+<meta name="twitter:description" content="背景说明在搜索广告和信息流广告中，除了常说的各种模型的应用之外，还有一块往往被大家所忽视，那就是物料优化，但是广告物料是直接呈现在网民面前的，对这一部分做好了优化工作无疑对广告的点击率/cpm以及用户体验上大有裨益。">
 <meta name="twitter:image" content="http://7xtapc.com2.z0.glb.clouddn.com/%E4%BA%BA%E7%B1%BB%E7%9A%84%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6.png">
 
 
@@ -394,6 +394,7 @@
 
       
         <h1 id="背景说明"><a href="#背景说明" class="headerlink" title="背景说明"></a>背景说明</h1><p>在搜索广告和信息流广告中，除了常说的各种模型的应用之外，还有一块往往被大家所忽视，那就是物料优化，但是广告物料是直接呈现在网民面前的，对这一部分做好了优化工作无疑对广告的点击率/cpm以及用户体验上大有裨益。</p>
+<a id="more"></a>
 <p>物料优化中最重要的两点就是：（1）&lt;关键词，标题&gt;的相关性以及标题质量；（2）&lt;关键词，图&gt;的相关性以及图片质量。当广告库规模较小时，通过运营手段能取得较好的效果，但是当关键词达到几十万甚至几百万乃至千万量级时，人力手段就显得力不从心了。</p>
 <p>这时，深度学习就能发挥优势。AI领域的两大难题就是：（1）自然语言理解；（2）图片理解；广告物料优化又恰恰是这两个领域的结合，因此想借助于深度学习等技术手段完全解决物料优化的问题是显然不可能的，只能Word2Vec、CNN、LSTM、Attention等技术手段进行初步优化；Attention机制恰恰能在较好的应用在这一场景中。</p>
 <h1 id="Attention机制原理"><a href="#Attention机制原理" class="headerlink" title="Attention机制原理"></a>Attention机制原理</h1><p>最近两年，注意力模型（Attention Model）被广泛应用于NLP，图像识别等领域中，甚至有基于Attention的FM模型AFM，下面将以机器翻译为例，简单阐述Attention模型的基本原理。</p>
