@@ -1,0 +1,834 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Android," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="1. 实现说明本文旨在通过TabLayout和ViewPager打造最常见的底部导航栏+多Tab结构的Android App。 1.1 斗鱼Android客户端结构先来简要看看斗鱼客户端基本结构：">
+<meta name="keywords" content="Android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="仿斗鱼Android客户端结构实现">
+<meta property="og:url" content="https://xdrush.github.io/2016/01/31/仿斗鱼Android客户端结构实现/index.html">
+<meta property="og:site_name" content="XDRush">
+<meta property="og:description" content="1. 实现说明本文旨在通过TabLayout和ViewPager打造最常见的底部导航栏+多Tab结构的Android App。 1.1 斗鱼Android客户端结构先来简要看看斗鱼客户端基本结构：">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/douyu_2.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/douyu_1.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/douyu_1_simulate.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/douyu_2_simulate.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/douyu_simulate_bug.png">
+<meta property="og:updated_time" content="2017-12-16T03:10:48.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="仿斗鱼Android客户端结构实现">
+<meta name="twitter:description" content="1. 实现说明本文旨在通过TabLayout和ViewPager打造最常见的底部导航栏+多Tab结构的Android App。 1.1 斗鱼Android客户端结构先来简要看看斗鱼客户端基本结构：">
+<meta name="twitter:image" content="http://7xtapc.com2.z0.glb.clouddn.com/douyu_2.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xdrush.github.io/2016/01/31/仿斗鱼Android客户端结构实现/"/>
+
+
+
+
+
+  <title> 仿斗鱼Android客户端结构实现 | XDRush </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">XDRush</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle">Ideas worth spreading and sharing...</p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="https://xdrush.github.io/2016/01/31/仿斗鱼Android客户端结构实现/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Dong Xu">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xtapc.com2.z0.glb.clouddn.com/mywebsite_icon.JPG">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="XDRush">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="XDRush" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                仿斗鱼Android客户端结构实现
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-01-31T16:00:39+08:00">
+                2016-01-31
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/01/31/仿斗鱼Android客户端结构实现/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/01/31/仿斗鱼Android客户端结构实现/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="1-实现说明"><a href="#1-实现说明" class="headerlink" title="1. 实现说明"></a>1. 实现说明</h1><p>本文旨在通过TabLayout和ViewPager打造最常见的底部导航栏+多Tab结构的Android App。</p>
+<h2 id="1-1-斗鱼Android客户端结构"><a href="#1-1-斗鱼Android客户端结构" class="headerlink" title="1.1 斗鱼Android客户端结构"></a>1.1 斗鱼Android客户端结构</h2><p>先来简要看看斗鱼客户端基本结构：</p>
+<a id="more"></a>
+<p><strong>首页结构</strong><br><img src="http://7xtapc.com2.z0.glb.clouddn.com/douyu_2.png" alt=""></p>
+<p><strong>直播页结构</strong><br><img src="http://7xtapc.com2.z0.glb.clouddn.com/douyu_1.png" alt=""></p>
+<h2 id="1-2-模仿结构示意图"><a href="#1-2-模仿结构示意图" class="headerlink" title="1.2 模仿结构示意图"></a>1.2 模仿结构示意图</h2><p><strong>模仿首页</strong><br><img src="http://7xtapc.com2.z0.glb.clouddn.com/douyu_1_simulate.png" alt=""></p>
+<p><strong>模仿直播页</strong><br><img src="http://7xtapc.com2.z0.glb.clouddn.com/douyu_2_simulate.png" alt=""></p>
+<p>其中，首页和直播页最大的区别是首页只有5个tab，儿直播页则有10个tab，其中几个tab又有若干个子Tab。</p>
+<h1 id="2-代码实现"><a href="#2-代码实现" class="headerlink" title="2. 代码实现"></a>2. 代码实现</h1><h2 id="2-1-主体代码实现"><a href="#2-1-主体代码实现" class="headerlink" title="2.1 主体代码实现"></a>2.1 主体代码实现</h2><p>采用Android官方提供的TabLayout+ViewPager结构来实现。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * 点击每个底部导航栏中的子项所对应的基类Fragment.</div><div class="line"> *</div><div class="line"> * Created by xdrush on 2017/1/26.</div><div class="line"> */</div><div class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">BaseItemFragment</span> <span class="keyword">extends</span> <span class="title">Fragment</span> </span>&#123;</div><div class="line"></div><div class="line">    TabLayout mTabLayout;</div><div class="line">    ViewPager mViewPager;</div><div class="line">    ItemFragmentAdapter mFragmentAdapter;</div><div class="line"></div><div class="line">    List&lt;Fragment&gt; mFragmentList;</div><div class="line">    List&lt;String&gt; mTitleList;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> View <span class="title">onCreateView</span><span class="params">(LayoutInflater layoutInflater, ViewGroup container,</span></span></div><div class="line">                             Bundle savedInstanceState) &#123;</div><div class="line">        View view = layoutInflater.inflate(R.layout.main_content_fragment_layout, container, <span class="keyword">false</span>);</div><div class="line"></div><div class="line">        setupViews(view);</div><div class="line">        initFragment();</div><div class="line">        setupFragment();</div><div class="line"></div><div class="line">        <span class="keyword">return</span> view;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">setupViews</span><span class="params">(View view)</span> </span>&#123;</div><div class="line">        mTabLayout = (TabLayout) view.findViewById(R.id.tablayout);</div><div class="line">        mViewPager = (ViewPager) view.findViewById(R.id.viewpager);</div><div class="line">        mFragmentList = <span class="keyword">new</span> ArrayList&lt;&gt;();</div><div class="line">        mTitleList = <span class="keyword">new</span> ArrayList&lt;&gt;();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">setupFragment</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">int</span> size = mTitleList.size();</div><div class="line">        <span class="keyword">if</span> (getActivity() == <span class="keyword">null</span> || <span class="number">0</span> == size) &#123;</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; size; i ++) &#123;</div><div class="line">            mTabLayout.addTab(mTabLayout.newTab().setText(mTitleList.get(i)));</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="comment">// 方法一：有bug， 没有回弹.</span></div><div class="line"><span class="comment">//        mFragmentAdapter = new ItemFragmentAdapter(getActivity().getSupportFragmentManager(),</span></div><div class="line"><span class="comment">//                mFragmentList, mTitleList);</span></div><div class="line"></div><div class="line">        <span class="comment">// 方法二：bug fixed， 有回弹.</span></div><div class="line">        mFragmentAdapter = <span class="keyword">new</span> ItemFragmentAdapter(getChildFragmentManager(),</div><div class="line">                mFragmentList, mTitleList);</div><div class="line"></div><div class="line">        mViewPager.setAdapter(mFragmentAdapter);</div><div class="line">        mTabLayout.setupWithViewPager(mViewPager);</div><div class="line"></div><div class="line">        setTabLayoutMode();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">setTabLayoutMode</span><span class="params">()</span></span>;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">initFragment</span><span class="params">()</span></span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">/**</span></div><div class="line"> * 首页Fragment.</div><div class="line"> *</div><div class="line"> * Created by xdrush on 2017/1/26.</div><div class="line"> */</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MainPageFragment</span> <span class="keyword">extends</span> <span class="title">BaseItemFragment</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> TAB_COUNTS = <span class="number">5</span>;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String[] TITLE = &#123;<span class="string">"推荐"</span>, <span class="string">"手游"</span>, <span class="string">"娱乐"</span>, <span class="string">"游戏"</span>, <span class="string">"趣玩"</span>, <span class="string">""</span>&#125;;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">initFragment</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; TAB_COUNTS; i ++) &#123;</div><div class="line">            String title = TITLE[i];</div><div class="line">            mTitleList.add(title);</div><div class="line"></div><div class="line">            BaseContentFragment fragment = <span class="keyword">new</span> BaseContentFragment();</div><div class="line">            fragment.setContent(title);</div><div class="line">            mFragmentList.add(fragment);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        mViewPager.addOnPageChangeListener(<span class="keyword">new</span> ViewPager.OnPageChangeListener() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onPageScrolled</span><span class="params">(<span class="keyword">int</span> position, <span class="keyword">float</span> positionOffset, <span class="keyword">int</span> positionOffsetPixels)</span> </span>&#123;</div><div class="line"></div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onPageSelected</span><span class="params">(<span class="keyword">int</span> position)</span> </span>&#123;</div><div class="line">                BaseContentFragment baseContentFragment = (BaseContentFragment) mFragmentList.get(position);</div><div class="line">                baseContentFragment.setContent(mTitleList.get(position));</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onPageScrollStateChanged</span><span class="params">(<span class="keyword">int</span> state)</span> </span>&#123;</div><div class="line"></div><div class="line">            &#125;</div><div class="line">        &#125;);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setTabLayoutMode</span><span class="params">()</span> </span>&#123;</div><div class="line">        mTabLayout.setTabMode(TabLayout.MODE_FIXED);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">/**</span></div><div class="line"> * 直播页面对应的Fragment.</div><div class="line"> *</div><div class="line"> * Created by xdrush on 2017/1/26.</div><div class="line"> */</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OnAirPageFragment</span> <span class="keyword">extends</span> <span class="title">BaseItemFragment</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> TAB_COUNTS = <span class="number">10</span>;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String[] TITLE = &#123;<span class="string">"常用"</span>, <span class="string">"全部"</span>, <span class="string">"热门游戏"</span>, <span class="string">"移动游戏"</span>, <span class="string">"鱼乐星天地"</span>,</div><div class="line">            <span class="string">"颜值"</span>, <span class="string">"科技"</span>, <span class="string">"文娱天堂"</span>, <span class="string">"正能量"</span>, <span class="string">"体育直播"</span>&#125;;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">initFragment</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; TAB_COUNTS; i ++) &#123;</div><div class="line">            String title = TITLE[i];</div><div class="line">            mTitleList.add(title);</div><div class="line"></div><div class="line">            BaseContentFragment fragment = <span class="keyword">new</span> BaseContentFragment();</div><div class="line">            fragment.setContent(title);</div><div class="line">            mFragmentList.add(fragment);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setTabLayoutMode</span><span class="params">()</span> </span>&#123;</div><div class="line">        mTabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>上面涉及到的MainPageFragment和OnAirPageFragment分别是点击底部“首页”和“直播”所对应的页面，其中BaseContentFragment类对应的每个子Tab的Fragment。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * 每个Tab对应的Fragment.</div><div class="line"> *</div><div class="line"> * Created by xdrush on 2017/1/26.</div><div class="line"> */</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BaseContentFragment</span> <span class="keyword">extends</span> <span class="title">Fragment</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> TextView mContentTv;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> View <span class="title">onCreateView</span><span class="params">(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)</span> </span>&#123;</div><div class="line">        View view = inflater.inflate(R.layout.base_content_fragment_layout, container, <span class="keyword">false</span>);</div><div class="line">        setupViews(view);</div><div class="line">        <span class="keyword">return</span> view;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">setupViews</span><span class="params">(View view)</span> </span>&#123;</div><div class="line">        mContentTv = (TextView) view.findViewById(R.id.content);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setContent</span><span class="params">(String content)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (<span class="keyword">null</span> == mContentTv) &#123;</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        mContentTv.setText(content);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>对应的xml文件如下：<br><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">// main_content_fragment_layout.xml</div><div class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</div><div class="line">&lt;LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"</div><div class="line">    xmlns:app="http://schemas.android.com/apk/res-auto"</div><div class="line">    android:orientation="vertical" android:layout_width="match_parent"</div><div class="line">    android:layout_height="match_parent"&gt;</div><div class="line"></div><div class="line">    &lt;android.support.design.widget.TabLayout</div><div class="line">        android:id="@+id/tablayout"</div><div class="line">        android:layout_width="match_parent"</div><div class="line">        android:layout_height="wrap_content"</div><div class="line">        android:background="#389d00"</div><div class="line">        app:tabIndicatorColor="#ffff00"</div><div class="line">        app:tabSelectedTextColor="#CD0000"</div><div class="line">        app:tabTextColor="#ffffff"/&gt;</div><div class="line"></div><div class="line">    &lt;android.support.v4.view.ViewPager</div><div class="line">        android:id="@+id/viewpager"</div><div class="line">        android:layout_width="match_parent"</div><div class="line">        android:layout_height="0dp"</div><div class="line">        android:layout_weight="1" /&gt;</div><div class="line"></div><div class="line">&lt;/LinearLayout&gt;</div><div class="line"></div><div class="line">// base_content_fragment_layout.xml</div><div class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</div><div class="line">&lt;LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"</div><div class="line">    android:orientation="vertical"</div><div class="line">    android:layout_width="match_parent"</div><div class="line">    android:layout_height="match_parent"&gt;</div><div class="line"></div><div class="line">    &lt;TextView</div><div class="line">        android:id="@+id/content"</div><div class="line">        android:layout_width="wrap_content"</div><div class="line">        android:layout_height="wrap_content"</div><div class="line">        android:text="hello world"</div><div class="line">        android:layout_gravity="center"/&gt;</div><div class="line"></div><div class="line">&lt;/LinearLayout&gt;</div></pre></td></tr></table></figure></p>
+<h2 id="2-2-注意问题"><a href="#2-2-注意问题" class="headerlink" title="2.2 注意问题"></a>2.2 注意问题</h2><p>可能你会注意到上面有个注释bug/bug fixed，对的，如果采用方法一来实现的话，将会出现下图所示现象：</p>
+<p><img src="http://7xtapc.com2.z0.glb.clouddn.com/douyu_simulate_bug.png" alt=""></p>
+<p>如上图所示：将会导致indicator和title对不上，整个ViewPager没有回弹过程，导致以上bug。这个问题用方法二即可解决。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/01/25/从源码角度聊聊View的工作原理/" rel="next" title="从源码角度聊聊View的工作原理">
+                <i class="fa fa-chevron-left"></i> 从源码角度聊聊View的工作原理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/02/10/聊聊RxJava & RxAndroid/" rel="prev" title="聊聊RxJava & RxAndroid">
+                聊聊RxJava & RxAndroid <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/01/31/仿斗鱼Android客户端结构实现/"
+           data-title="仿斗鱼Android客户端结构实现" data-url="https://xdrush.github.io/2016/01/31/仿斗鱼Android客户端结构实现/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xtapc.com2.z0.glb.clouddn.com/mywebsite_icon.JPG"
+               alt="Dong Xu" />
+          <p class="site-author-name" itemprop="name">Dong Xu</p>
+          <p class="site-description motion-element" itemprop="description">Ideas worth spreading and sharing...</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">22</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-实现说明"><span class="nav-number">1.</span> <span class="nav-text">1. 实现说明</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-斗鱼Android客户端结构"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 斗鱼Android客户端结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-模仿结构示意图"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 模仿结构示意图</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-代码实现"><span class="nav-number">2.</span> <span class="nav-text">2. 代码实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-主体代码实现"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 主体代码实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-注意问题"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 注意问题</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Dong Xu</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"xdrush"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
