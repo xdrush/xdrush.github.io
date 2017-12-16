@@ -264,7 +264,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xdrush.github.io/2016/04/20/MultiDex实践/">
+  <link itemprop="mainEntityOfPage" href="https://xdrush.github.io/2016/01/25/从源码角度聊聊View的工作原理/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="Dong Xu">
@@ -289,8 +289,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/04/20/MultiDex实践/" itemprop="url">
-                  MultiDex实践
+                <a class="post-title-link" href="/2016/01/25/从源码角度聊聊View的工作原理/" itemprop="url">
+                  从源码角度聊聊View的工作原理
                 </a>
               
             
@@ -306,8 +306,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-04-20T23:02:39+08:00">
-                2016-04-20
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-01-25T23:02:39+08:00">
+                2016-01-25
               </time>
             
 
@@ -347,8 +347,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2016/04/20/MultiDex实践/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/20/MultiDex实践/" itemprop="commentCount"></span>
+                <a href="/2016/01/25/从源码角度聊聊View的工作原理/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/01/25/从源码角度聊聊View的工作原理/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -375,16 +375,13 @@
 
       
         
-          <h2 id="Why-MultiDex"><a href="#Why-MultiDex" class="headerlink" title="Why MultiDex?"></a>Why MultiDex?</h2><p>Android应用65535方法数的限制一直为广大开发者所诟病，在应用功能越来越丰富、各种开源库越来越多的今天，65k方法数瓶颈俨然已是一大绊脚石。至于怎么解决这个问题，先来看看google官方给出的方案：</p>
-<ol>
-<li>插件化</li>
-</ol>
-<p>将应用的非核心功能做成单独的App，实现该App和插件App相关的接口即可，实现以及体验如何，大家不妨来体验下<a href="https://play.google.com/store/apps/details?id=mobi.mgeek.TunnyBrowser&amp;hl=en" target="_blank" rel="external">Dolphin浏览器</a>（这里做个小广告）。</p>
-<ol>
-<li>MultiDex
+          <h2 id="1-Android窗口模型"><a href="#1-Android窗口模型" class="headerlink" title="1 Android窗口模型"></a>1 Android窗口模型</h2><p>理解View工作原理之前，有几个基本概念需要阐述清楚：</p>
+<h3 id="1-1-Window"><a href="#1-1-Window" class="headerlink" title="1.1 Window"></a>1.1 Window</h3><p>Window是一个抽象类，代表的就是手机屏幕，其具体实现是PhoneWindow，Android中所有的视图都是通过Window来呈现的，无论是Activity、Dialog还是Toast，它们的视图实际上都是依附在Window上，因此Window实际上是View的直接管理者。</p>
+<h3 id="1-2-ViewRoot和DecorView"><a href="#1-2-ViewRoot和DecorView" class="headerlink" title="1.2 ViewRoot和DecorView"></a>1.2 ViewRoot和DecorView</h3><p>ViewRoot对应于ViewRootImpl类，它是连接WindowManager和DecorView的纽带，View的工作原理同ViewRoot紧密相连.</p>
+<p>DecorView是Activity的顶级View，包含标题栏和内容栏，内容栏是一定的存在的，而且其id为android.R.id.content，通过setContentView()将布局文件添加到内容栏中，<br>这篇文章有助于我们理解</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2016/04/20/MultiDex实践/#more" rel="contents">
+            <a class="btn" href="/2016/01/25/从源码角度聊聊View的工作原理/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -425,7 +422,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xdrush.github.io/2016/04/16/About_XDRush/">
+  <link itemprop="mainEntityOfPage" href="https://xdrush.github.io/2016/01/16/About_XDRush/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="Dong Xu">
@@ -450,7 +447,7 @@
             
               
                 
-                <a class="post-title-link" href="/2016/04/16/About_XDRush/" itemprop="url">
+                <a class="post-title-link" href="/2016/01/16/About_XDRush/" itemprop="url">
                   About Me
                 </a>
               
@@ -467,8 +464,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-04-16T23:02:39+08:00">
-                2016-04-16
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-01-16T23:02:39+08:00">
+                2016-01-16
               </time>
             
 
@@ -486,8 +483,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2016/04/16/About_XDRush/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/16/About_XDRush/" itemprop="commentCount"></span>
+                <a href="/2016/01/16/About_XDRush/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/01/16/About_XDRush/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -518,7 +515,7 @@
 <p>BS.<br>2008/9~2012/6：Huazhong University of Science of Technology<br>School of Automation<br>……………………………………………………<br>MS.<br>2012/9~2015/6: Huazhong University of Science of Technology<br>Electronics and Information Engineering<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2016/04/16/About_XDRush/#more" rel="contents">
+            <a class="btn" href="/2016/01/16/About_XDRush/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
