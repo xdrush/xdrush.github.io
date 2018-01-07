@@ -92,7 +92,7 @@
 <meta property="og:site_name" content="XDRush">
 <meta property="og:description" content="1 背景说明在求解机器学习和深度学习算法的模型参数，即无约束优化问题时，梯度下降（Gradient Descent）是最常采用的方法之一，其他的常用的方法是最小二乘法、牛顿法和拟牛顿法。这里就对梯度下降法做一个完整的总结。 2 梯度的概念2.1 什么是梯度在微积分里面，对多元函数的参数求$\Phi$偏导数，把求得的各个参数的偏导数以向量的形式写出来，就是梯度。比如函数$f(x,y)$, 分别对$(">
 <meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E6%B3%95%E7%A4%BA%E6%84%8F%E5%9B%BE.png">
-<meta property="og:updated_time" content="2018-01-06T09:02:58.780Z">
+<meta property="og:updated_time" content="2018-01-07T05:19:14.104Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="梯度下降法及其理解">
 <meta name="twitter:description" content="1 背景说明在求解机器学习和深度学习算法的模型参数，即无约束优化问题时，梯度下降（Gradient Descent）是最常采用的方法之一，其他的常用的方法是最小二乘法、牛顿法和拟牛顿法。这里就对梯度下降法做一个完整的总结。 2 梯度的概念2.1 什么是梯度在微积分里面，对多元函数的参数求$\Phi$偏导数，把求得的各个参数的偏导数以向量的形式写出来，就是梯度。比如函数$f(x,y)$, 分别对$(">
@@ -364,7 +364,7 @@
 <ul>
 <li>步长（Learning rate）：步长决定了在梯度下降迭代的过程中，每一步沿梯度负方向前进的长度。用上面下山的例子，步长就是在当前这一步所在位置沿着最陡峭最易下山的位置走的那一步的长度。</li>
 <li>特征（feature）：指的是样本中输入部分，比如样本$(x_0,y_0)$,$(x_1,y_1)$，即样本特征为$x$，样本输出为$y$。</li>
-<li>假设函数（hypothesis function）：在监督学习中，为了拟合输入样本，而使用的假设函数，记为$h_θ(x)$。比如对于样本$(x_i,y<em>i)(i=1,2,…n)$,可以采用拟合函数如下： $h</em>θ(x) = θ_0+θ_1x$。</li>
+<li>假设函数（hypothesis function）：在监督学习中，为了拟合输入样本，而使用的假设函数，记为$h_θ(x)$。比如对于样本$(x_i,y<em>i)$$(i=1,2,…n)$,可以采用拟合函数如下：$h</em>θ(x)=θ_0+θ_1x$。</li>
 <li>损失函数（loss function）：为了评估模型拟合的好坏，通常用损失函数来度量拟合的程度。损失函数极小化，意味着拟合程度最好，对应的模型参数即为最优参数。在线性回归中，损失函数通常为样本输出和假设函数的差取平方。比如对于样本$(x_i,y_i)(i=1,2,…n)$,采用线性回归，损失函数为：<br>  $J(θ_0,θ<em>1)=\sum</em>{i=1}^{m}(h_θ(x_i)−y_i)^2$<br>其中$x_i$表示样本特征$x$的第$i$个元素，$y<em>i$表示样本输出$y$的第$i$个元素，$h</em>θ(x_i)$为假设函数。   </li>
 </ul>
 </blockquote>
