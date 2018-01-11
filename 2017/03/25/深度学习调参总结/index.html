@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="计算广告," />
+  <meta name="keywords" content="深度学习," />
 
 
 
@@ -84,26 +84,17 @@
 
 
 
-<meta name="description" content="1 背景说明在互联网精准广告中，可以从多个角度来评估一个CTR模型的性能，但通常以AUC作为模型评估的最直接指标，直观上讲，AUC是从排序能力的角度来对模型进行评估。下面将详细解释AUC的含义及其计算方式，">
-<meta name="keywords" content="计算广告">
+<meta name="description" content="1 说明调参基本上是每个深度学习从业者的日常之一，就是吃饭一样，甚至有些时候每天的工作就只是改动一两个参数然后等着分析结果（这让我想起了研二时候，每周就只是改动几个参数，竟然也能整好几页ppt给老板汇报）。 这篇文章在自己工作的基础上，再结合同事以及网上一些牛人的经验，汇总成一篇调参总结，以供自己后续查阅。">
+<meta name="keywords" content="深度学习">
 <meta property="og:type" content="article">
-<meta property="og:title" content="AUC及其理解">
-<meta property="og:url" content="https://xdrush.github.io/2017/03/04/AUC及其理解/index.html">
+<meta property="og:title" content="深度学习调参总结（持续更新中）">
+<meta property="og:url" content="https://xdrush.github.io/2017/03/25/深度学习调参总结/index.html">
 <meta property="og:site_name" content="XDRush">
-<meta property="og:description" content="1 背景说明在互联网精准广告中，可以从多个角度来评估一个CTR模型的性能，但通常以AUC作为模型评估的最直接指标，直观上讲，AUC是从排序能力的角度来对模型进行评估。下面将详细解释AUC的含义及其计算方式，">
-<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/ROC%E6%9B%B2%E7%BA%BF.png">
-<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/tp-tn%E6%9B%B2%E7%BA%BF.png">
-<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/%E5%88%86%E7%B1%BB%E5%87%BD%E6%95%B0.png">
-<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/%E6%A0%B7%E6%9C%AC%E5%BE%97%E5%88%8601.png">
-<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/%E6%A0%B7%E6%9C%AC%E5%BE%97%E5%88%8602.png">
-<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/ROC%E6%9B%B2%E7%BA%BF%E7%BB%98%E5%88%B6.png">
-<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/auc%E6%9D%83%E9%87%8D.png">
-<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/%E6%A0%B7%E6%9C%AC%E6%8E%92%E5%BA%8F.png">
-<meta property="og:updated_time" content="2018-01-09T16:21:07.187Z">
+<meta property="og:description" content="1 说明调参基本上是每个深度学习从业者的日常之一，就是吃饭一样，甚至有些时候每天的工作就只是改动一两个参数然后等着分析结果（这让我想起了研二时候，每周就只是改动几个参数，竟然也能整好几页ppt给老板汇报）。 这篇文章在自己工作的基础上，再结合同事以及网上一些牛人的经验，汇总成一篇调参总结，以供自己后续查阅。">
+<meta property="og:updated_time" content="2018-01-11T16:19:29.810Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="AUC及其理解">
-<meta name="twitter:description" content="1 背景说明在互联网精准广告中，可以从多个角度来评估一个CTR模型的性能，但通常以AUC作为模型评估的最直接指标，直观上讲，AUC是从排序能力的角度来对模型进行评估。下面将详细解释AUC的含义及其计算方式，">
-<meta name="twitter:image" content="http://7xtapc.com2.z0.glb.clouddn.com/ROC%E6%9B%B2%E7%BA%BF.png">
+<meta name="twitter:title" content="深度学习调参总结（持续更新中）">
+<meta name="twitter:description" content="1 说明调参基本上是每个深度学习从业者的日常之一，就是吃饭一样，甚至有些时候每天的工作就只是改动一两个参数然后等着分析结果（这让我想起了研二时候，每周就只是改动几个参数，竟然也能整好几页ppt给老板汇报）。 这篇文章在自己工作的基础上，再结合同事以及网上一些牛人的经验，汇总成一篇调参总结，以供自己后续查阅。">
 
 
 
@@ -131,13 +122,13 @@
 
 
 
-  <link rel="canonical" href="https://xdrush.github.io/2017/03/04/AUC及其理解/"/>
+  <link rel="canonical" href="https://xdrush.github.io/2017/03/25/深度学习调参总结/"/>
 
 
 
 
 
-  <title> AUC及其理解 | XDRush </title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  <title> 深度学习调参总结（持续更新中） | XDRush </title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -273,7 +264,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xdrush.github.io/2017/03/04/AUC及其理解/">
+  <link itemprop="mainEntityOfPage" href="https://xdrush.github.io/2017/03/25/深度学习调参总结/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="Dong Xu">
@@ -297,7 +288,7 @@
             
             
               
-                AUC及其理解
+                深度学习调参总结（持续更新中）
               
             
           </h1>
@@ -312,8 +303,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-04T19:05:39+08:00">
-                2017-03-04
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-25T20:05:39+08:00">
+                2017-03-25
               </time>
             
 
@@ -331,8 +322,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2017/03/04/AUC及其理解/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/03/04/AUC及其理解/" itemprop="commentCount"></span>
+                <a href="/2017/03/25/深度学习调参总结/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/03/25/深度学习调参总结/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -358,30 +349,65 @@
       
 
       
-        <h1 id="1-背景说明"><a href="#1-背景说明" class="headerlink" title="1 背景说明"></a>1 背景说明</h1><p>在互联网精准广告中，可以从多个角度来评估一个CTR模型的性能，但通常以AUC作为模型评估的最直接指标，直观上讲，AUC是从排序能力的角度来对模型进行评估。下面将详细解释AUC的含义及其计算方式，<br><a id="more"></a></p>
-<h1 id="2-ROC含义及其说明"><a href="#2-ROC含义及其说明" class="headerlink" title="2 ROC含义及其说明"></a>2 ROC含义及其说明</h1><h2 id="2-1-ROC曲线理解"><a href="#2-1-ROC曲线理解" class="headerlink" title="2.1 ROC曲线理解"></a>2.1 ROC曲线理解</h2><p>ROC（Receiver Operating Characteristic）曲线和AUC常被用来评价一个二值分类器的优劣，分类器算法，常用的评价指标主要有precision，recall，F-score；<br>一个典型的ROC曲线如下图所示：<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/ROC%E6%9B%B2%E7%BA%BF.png" alt=""></p>
-<p>ROC曲线的横坐标为false positive rate（FPR），纵坐标为true positive rate（TPR），下面详细说明FPR和TPR是如何定义的：<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/tp-tn%E6%9B%B2%E7%BA%BF.png" alt=""></p>
-<p>TP：预测是正的样本，实际上也是正的样本<br>TP：预测是正的样本，实际上是负样本<br>FN：预测是为负样本，实际上是正样本<br>TN：预测是为负样本，实际上也是负样本<br>正确率：测试出来准确的正样本/所有的正样本：TP/(TP + FP)<br>召回率：测试出来正确的正样本/所有的正样本：TP/(FP  +  FN)</p>
-<p>TPR：true positive rate，TPR = TP / (TP + FN)，表示预测为正的正确结果TP在所有正样本T中的占比，显然TPR越大，模型的预估能力更好；<br>FPR：false positive rate，FPR = FP / (FP + TN)，表示预测为正的错误结果FP在所有负样本F中的占比，显然FPR越大，模型的预估能力越差；</p>
-<p>接下来，我们考虑ROC曲线上的四个点和一条线：<br>1.第一个点(0,  1)，即FPR = 0, TPR = 1，这意味着，FN = 0，并且FP = 0，这是一个完美的分类器，将所有的样本都正确分类；<br>2.第二个点(1,  0)，即FPR = 1, TPR = 0，这意味着，TP = 0，并且FN = 0，这是一个最糟糕的分类器，因为它成功避开了所有的正确答案；<br>3.第三个点(0,  0)，即FPR = 0, TPR = 0，这意味着，TP = 0, FP = 0，这意味着，分类器将所有的样本都预测为负样本；<br>4.第四个点(1,  1)即FPR = 1, TPR = 0，这意味着，FN = 0, TN = 0，也就是分类器将分类器将所有的样本都预测为正样本；<br>经过以上分析，我们可以断定，<strong>ROC曲线越接近左上角，分类器的性能越好</strong>。</p>
-<p>下面考虑ROC曲线y=x上的点。这条对角线上的点其实表示的是一个采用随机猜测策略的分类器结果，例如(0.5,  0.5)，即TP = FN, FP = TN，表示该分类器随机对于一半的样本猜测为正样本，另外一半的样本为负样本。</p>
-<p>这里需要思考一个问题：<br>给一堆训练样本，那么得到一个分类结果，得到FPR和TPR，那么对应的是ROC上的一个点，ROC曲线是如何获取的呢？<br>Wikipedia上是这么解释的：<br>In signal detection theory, a receiver operating characteristic (ROC), or simply ROC curve, is a graphical plot which illustrates the performance of a binary classifier system as its discrimination threshold is varied.<br>这里的关键在于“as its discrimination threshold is varied”，如何理解？我们忽略了分类器的一个重要功能“概率输出”，即表示分类器某个样本具有多大的概率属于正样本（或者负样本），这里应该对分类器判断为正样本的概率阈值进行一定的调整，获得多组坐标点数据，进而得到ROC曲线。</p>
-<h2 id="2-2-ROC曲线绘制"><a href="#2-2-ROC曲线绘制" class="headerlink" title="2.2 ROC曲线绘制"></a>2.2 ROC曲线绘制</h2><p>假设模型M对样本进行预测，当预测值大于阈值r时，采用下面的函数来预测最后的结果：<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/%E5%88%86%E7%B1%BB%E5%87%BD%E6%95%B0.png" alt=""></p>
-<p>然后，对每一个r，模型对所有的样本预测一遍，计算所得到的TPR和FPR，对所有的点(FPR,  TPR)在ROC图上进行标注就可以得到ROC曲线，AUC就是指ROC曲线下方的面积。举一个例子来说明，下表中有10个样本，5个正样本，5个负样本，即T = 5， F = 5，<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/%E6%A0%B7%E6%9C%AC%E5%BE%97%E5%88%8601.png" alt=""></p>
-<p>第一列表示模型M对样本的打分，第二列表示样本实际为正/负样本，我们让r从正无穷逐渐减小到负无穷，对每一个区间的r计算(FPR,TPR)，计算结果如下：<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/%E6%A0%B7%E6%9C%AC%E5%BE%97%E5%88%8602.png" alt=""></p>
-<p>由上表绘制ROC曲线如下：<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/ROC%E6%9B%B2%E7%BA%BF%E7%BB%98%E5%88%B6.png" alt="ROC曲线绘制"></p>
-<p>以上就是ROC曲线的含义及其绘制步骤。</p>
-<h1 id="3-AUC计算及其理解"><a href="#3-AUC计算及其理解" class="headerlink" title="3 AUC计算及其理解"></a>3 AUC计算及其理解</h1><h2 id="3-1-AUC计算"><a href="#3-1-AUC计算" class="headerlink" title="3.1 AUC计算"></a>3.1 AUC计算</h2><p><strong>（1）方法一：计算ROC面积法</strong><br>由上文所述，AUC即为ROC曲线下方的面积，按梯形法计算上图的面积为0.62。</p>
-<p><strong>（2）方法二：随机抽选正负样本对法</strong><br>在所有标注样本中，正样本共有T个，负样本共有F个，如果随机抽取一个正样本和负样本，共有T<em>F个pair，其中如果有s个pair的正样本pair满足正样本的score高于负样本（权重为1），v个pair的正负样本score相同（权重为0.5），则AUC就等于：<br>(s +  0.5 </em>  v)  /  (T  <em>  F)<br>上例中，s = 15， v = 1，则AUC = ( 15 +  1 </em>  0.5)  /  (5 *  5)，和梯形法计算结果一致。<br>整体上对于一个样本pair：<i, j="">的权重Wij的计算如下：<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/auc%E6%9D%83%E9%87%8D.png" alt="AUC权重计算"></i,></p>
-<p>s(i)和s(j)分别表示正样本和负样本的score。</p>
-<p><strong>（3）方法三：排序求和法</strong><br>上面提到了两种计算AUC的方法，一种梯形法，另一种权重法，然而这两种方法在单机上计算复杂度比较高，下面这种方式计算AUC比较简单：<br>我们可以将所有样本按升序排好后，通过样本的序号(或者是排序位置，从1开始)rank来计算，计算公式如下：<br>AUC = ((所有正样本的rank相加) - T<em>(T + 1)/2) / (T </em> F)<br>对相等score的样本，需要赋予相同的rank，即把所有这些score相等的样本的rank和取平均值。<br>上表中结果重新排序如下：<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/%E6%A0%B7%E6%9C%AC%E6%8E%92%E5%BA%8F.png" alt="样本排序"></p>
-<p>所有正样本的rank相加 = 10 + 9 + (5 +  6) /2 +  4  +  2 =  30.5，注意5和6由于score相同，需要均分rank和。<br>AUC = (30.5  -  5 <em>  6 /  2)  /  (5 </em>  5)  =  0.62</p>
-<h2 id="3-2-AUC理解"><a href="#3-2-AUC理解" class="headerlink" title="3.2 AUC理解"></a>3.2 AUC理解</h2><p>上例中给出了10个样本，其中5个正样本5个负样本，1表示样本发生了click，0表示样本有曝光但是没有被click，score表示样本的预估ctr（pCtr），我们的期望是我们的预估的ctr高的广告，其实际应该有click，这样就说明我的预估是有效且准确的，当然没有click发生也是可以理解，预估目前还做不到100%的准确。也就是说，被点击的样本预估的pCtr应该要高于没有被点击的样本，当所有被点击的样本pCtr都要大于未被点击的样本pCtr时，模型是最优的，当然这只是理想情况。</p>
-<p>理想的排序能力是按照pCTR进行预估降序排列后，所有的正样本都排在负样本的前面，即预估会排在前面的广告都会被click，模型优化的目标就是朝这个理想目标靠拢。</p>
-<p>AUC的值不会大于1，又由于ROC曲线一般都处于y=x这条直线的上方，所以AUC的取值范围一般在0.5到1之间。使用AUC作为评价标准是因为很多时候ROC曲线并不能清晰的说明哪个分类器的效果更好，而作为一个数值，对应AUC更大的分类器效果更好。而且ROC越靠近左上角越好，对应着AUC面积越大越好。</p>
-<p>先AUC是一个概率值，当随机挑选一个正样本以及一个负样本时，当前的分类器根据计算得到的score值将这个正样本排在负样本前面的概率就是AUC值。当然AUC越大，当前的分类算法越有可能将正样本排在负样本前面，即能够更好的分类。</p>
-<p><strong>为什么使用ROC？</strong>既然有这么多评价标准，为什么还要用ROC和AUC呢？因为ROC有个很好的特性：当测试机中的正负样本分布变化的时候，ROC曲线能够保持不变。<br>在实际的数据集中，经常会出现类不平衡现象，即负样本比正样本多很多（或者相反），而且测试数据中的正负样本的分布也可能随着时间变化。</p>
-
+        <h1 id="1-说明"><a href="#1-说明" class="headerlink" title="1 说明"></a>1 说明</h1><p>调参基本上是每个深度学习从业者的日常之一，就是吃饭一样，甚至有些时候每天的工作就只是改动一两个参数然后等着分析结果（这让我想起了研二时候，每周就只是改动几个参数，竟然也能整好几页ppt给老板汇报）。</p>
+<p>这篇文章在自己工作的基础上，再结合同事以及网上一些牛人的经验，汇总成一篇调参总结，以供自己后续查阅。</p>
+<a id="more"></a>
+<h1 id="2-深度学习调参总结"><a href="#2-深度学习调参总结" class="headerlink" title="2 深度学习调参总结"></a>2 深度学习调参总结</h1><h2 id="2-1-养成良好的编码习惯"><a href="#2-1-养成良好的编码习惯" class="headerlink" title="2.1 养成良好的编码习惯"></a>2.1 养成良好的编码习惯</h2><p>由于深度学习实验超参众多，养成良好的代码风格，可以让你的人工或者自动调参更加省力，有以下几点可能对你有帮助：</p>
+<blockquote>
+<ul>
+<li>将各个参数的设置部分集中在一起。如果参数的设置分布在代码的各个地方，那么修改的过程想必会非常痛苦</li>
+<li>可以输出模型的损失函数值以及训练集和验证集上的准确率，打印一些中间结果有助于查看模型的进展（诸如收敛等等）</li>
+<li>可以考虑设计一个子程序，可以根据给定的参数，启动训练并监控和周期性保存评估结果。再由一个主程序，分配参数以及并行启动一系列子程序</li>
+</ul>
+</blockquote>
+<h2 id="2-2-画出模型结构图"><a href="#2-2-画出模型结构图" class="headerlink" title="2.2 画出模型结构图"></a>2.2 画出模型结构图</h2><p>在一张白纸上画出设计的模型结构图，同时将一些参数设置在图中标出来便于随时查看。</p>
+<p>画图是一个很好的习惯，一般是训练数据遍历一轮以后，就输出一下训练集和验证集准确率。同时画到一张图上。这样训练一段时间以后，如果模型一直没有收敛，那么就可以停止训练，尝试其他参数了，以节省时间。 </p>
+<p>如果训练到最后，训练集，测试集准确率都很低，那么说明模型有可能欠拟合。那么后续调节参数方向，就是增强模型的拟合能力。例如增加网络层数，增加节点数，减少dropout值，减少L2正则值等等。 </p>
+<p>如果训练集准确率较高，测试集准确率比较低，那么模型有可能过拟合，这个时候就需要向提高模型泛化能力的方向，调节参数。</p>
+<h2 id="2-3-调参由粗粒度到细粒度"><a href="#2-3-调参由粗粒度到细粒度" class="headerlink" title="2.3 调参由粗粒度到细粒度"></a>2.3 调参由粗粒度到细粒度</h2><p>实践中，一般先进行初步范围搜索，然后根据好结果出现的地方，再缩小范围进行更精细的搜索。</p>
+<p>建议先参考相关论文，以论文中给出的参数作为初始参数。至少论文中的参数，是个不差的结果。如果找不到参考，那么只能自己尝试了。可以先从比较重要、对实验结果影响比较大的参数开始，同时固定其他参数，得到一个差不多的结果以后，在这个结果的基础上，再调其他参数。例如学习率一般就比正则值、dropout值重要的话，学习率设置的不合适，不仅结果可能变差，模型甚至会无法收敛。</p>
+<p>如果实在找不到一组参数可以让模型收敛，那么就需要检查，是不是其他地方出了问题，例如模型实现，数据等等。</p>
+<h2 id="2-4-先在小数据集上做尝试"><a href="#2-4-先在小数据集上做尝试" class="headerlink" title="2.4 先在小数据集上做尝试"></a>2.4 先在小数据集上做尝试</h2><p>调参只是为了寻找合适的参数，而不是产出最终模型。一般在小数据集上合适的参数，在大数据集上效果也不会太差。因此可以尝试对数据进行精简，以提高速度，在有限的时间内可以尝试更多参数。较常用的有以下几种方法：</p>
+<blockquote>
+<ul>
+<li>对训练数据进行采样:例如原来100W条数据，先采样成1W，进行实验看看</li>
+<li>减少训练类别:例如手写数字识别任务，原来是10个类别，那么我们可以先在2个类别上训练，看看结果如何</li>
+</ul>
+</blockquote>
+<h2 id="2-5-常用超参数探索方式"><a href="#2-5-常用超参数探索方式" class="headerlink" title="2.5 常用超参数探索方式"></a>2.5 常用超参数探索方式</h2><p>建议优先在对数尺度上进行超参数搜索。比较典型的是学习率和正则化项，我们可以从诸如0.001、0.01、0.1、1、10，以10为阶数进行尝试。因为他们对训练的影响是相乘的效果。不过有些参数，还是建议在原始尺度上进行搜索，例如dropout值: 0.3、0.5、0.7。</p>
+<h2 id="2-6-一些基本的经验参数"><a href="#2-6-一些基本的经验参数" class="headerlink" title="2.6 一些基本的经验参数"></a>2.6 一些基本的经验参数</h2><p>这里给出一些参数的经验值，避免在调参的时候，毫无头绪。</p>
+<blockquote>
+<ul>
+<li>learning rate:1、0.1、0.01、0.001，一般从1开始尝试。很少见learning rate大于10的。学习率一般要随着训练进行衰减。衰减系数一般是0.5。 衰减时机，可以是验证集准确率不再上升时，或固定训练多少个周期以后。<br>不过更建议使用自适应梯度的办法，例如adam,adadelta,rmsprop等，这些一般使用相关论文提供的默认值即可，可以避免再费劲调节学习率。对RNN来说，有个经验，如果RNN要处理的序列比较长，或者RNN层数比较多，那么learning rate一般小一些比较好，否则有可能出现结果不收敛，甚至Nan等问题</li>
+<li>网络层数： 先从1层开始</li>
+<li>每层结点数： 16、32、128，超过1000的情况比较少见，超过1W的从来没有见过</li>
+<li>batch size: 128上下开始，batch size值增加，的确能提高训练速度，但是有可能收敛结果变差。如果显存大小允许，可以考虑从一个比较大的值开始尝试。因为batch size太大，一般不会对结果有太大的影响，而batch size太小的话，结果有可能很差</li>
+<li>clip c(梯度裁剪): 限制最大梯度其实是value =sqrt(w1^2+w2^2….)，如果value超过了阈值，就算一个衰减系系数，让value的值等于阈值: 5、10、15</li>
+<li>dropout：0.5</li>
+<li>L2正则：1.0，超过10的很少见</li>
+<li>词向量embedding大小：128，256</li>
+<li>正负样本比例： 这个是非常忽视，但是在很多分类问题上，又非常重要的参数。很多人往往习惯使用训练数据中默认的正负类别比例，当训练数据非常不平衡的时候，模型很有可能会偏向数目较大的类别，从而影响最终训练结果。除了尝试训练数据默认的正负类别比例之外，建议对数目较小的样本做过采样，例如进行复制。提高他们的比例，看看效果如何，这个对多分类问题同样适用。在使用mini-batch方法进行训练的时候，尽量让一个batch内，各类别的比例平衡，这个在图像识别等多分类任务上非常重要。</li>
+</ul>
+</blockquote>
+<h2 id="2-7-自动调参"><a href="#2-7-自动调参" class="headerlink" title="2.7 自动调参"></a>2.7 自动调参</h2><p>人工一直盯着实验，毕竟太累。自动调参当前也有不少研究。下面介绍几种比较实用的办法：</p>
+<p><strong>（1）Gird Search</strong><br>这个是最常见的，具体说，就是每种参数确定好几个要尝试的值，然后像一个网格一样，把所有参数值的组合遍历一下。优点是实现简单暴力，如果能全部遍历的话，结果比较可靠。缺点是太费时间了，特别像神经网络，一般尝试不了太多的参数组合。</p>
+<p><strong>（2）Random Search</strong><br>Bengio在Random Search for Hyper-Parameter Optimization中指出，Random Search比Gird Search更有效。实际操作的时候，一般也是先用Gird Search的方法，得到所有候选参数，然后每次从中随机选择进行训练。</p>
+<p><strong>（3）Bayesian Optimization</strong> 贝叶斯优化，考虑到了不同参数对应的实验结果值，因此更节省时间。和网络搜索相比简直就是老牛和跑车的区别。具体原理可以参考这个论文： Practical Bayesian Optimization of Machine Learning Algorithms。</p>
+<h2 id="2-8-参数初始化"><a href="#2-8-参数初始化" class="headerlink" title="2.8 参数初始化"></a>2.8 参数初始化</h2><p>下面几种方式，随便选一个，结果基本都差不多，但是一定要做，否则可能会减慢收敛速度，影响收敛结果，甚至造成Nan等一系列问题。<br>$n_in$为网络的输入大小，$n_out$为网络的输出大小，$n$为$n_in$或$(n_in+n_out)*0.5$</p>
+<p><strong>（1）uniform均匀分布初始化</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">w = np.random.uniform(low=-scale, high=scale, size=[n_in,n_out])</div></pre></td></tr></table></figure></p>
+<p>Xavier初始法，适用于普通激活函数(tanh,sigmoid)：scale = np.sqrt(3/n)；<br>He初始化，适用于ReLU：scale = np.sqrt(6/n)；<br><strong>（2）normal高斯分布初始化</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">w = np.random.randn(n_in,n_out) * stdev</div></pre></td></tr></table></figure></p>
+<p>stdev为高斯分布的标准差，均值设为0。<br>Xavier初始法，适用于普通激活函数 (tanh,sigmoid)：stdev = np.sqrt(n)；<br>He初始化，适用于ReLU：stdev = np.sqrt(2/n)</p>
+<p><strong>（3）svd初始化</strong><br>对RNN有比较好的效果，参考论文：<a href="https://arxiv.org/abs/1312.6120。" target="_blank" rel="external">https://arxiv.org/abs/1312.6120。</a></p>
+<h2 id="2-9-模型融合"><a href="#2-9-模型融合" class="headerlink" title="2.9 模型融合"></a>2.9 模型融合</h2><p>Ensemble是论文刷结果的终极核武器，深度学习中一般有以下几种方式：</p>
+<blockquote>
+<ul>
+<li>同样的参数，不同的初始化方式</li>
+<li>不同的参数，通过cross-validation,选取最好的几组</li>
+<li>同样的参数，模型训练的不同阶段，即不同迭代次数的模型</li>
+<li>不同的模型，进行线性融合：例如RNN和传统模型</li>
+</ul>
+</blockquote>
+<h2 id="2-10-To-Be-Continued…"><a href="#2-10-To-Be-Continued…" class="headerlink" title="2.10 To Be Continued…"></a>2.10 To Be Continued…</h2>
       
     </div>
 
@@ -404,7 +430,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/计算广告/" rel="tag"># 计算广告</a>
+            <a href="/tags/深度学习/" rel="tag"># 深度学习</a>
           
         </div>
       
@@ -413,8 +439,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/02/13/梯度下降法及其理解/" rel="next" title="梯度下降法及其理解">
-                <i class="fa fa-chevron-left"></i> 梯度下降法及其理解
+              <a href="/2017/03/04/AUC及其理解/" rel="next" title="AUC及其理解">
+                <i class="fa fa-chevron-left"></i> AUC及其理解
               </a>
             
           </div>
@@ -423,8 +449,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2017/03/25/深度学习调参总结/" rel="prev" title="深度学习调参总结（持续更新中）">
-                深度学习调参总结（持续更新中） <i class="fa fa-chevron-right"></i>
+              <a href="/2017/07/10/Hadoop使用总结/" rel="prev" title="Hadoop streaming使用总结（持续更新）">
+                Hadoop streaming使用总结（持续更新） <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -451,8 +477,8 @@
           
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2017/03/04/AUC及其理解/"
-           data-title="AUC及其理解" data-url="https://xdrush.github.io/2017/03/04/AUC及其理解/">
+      <div class="ds-thread" data-thread-key="2017/03/25/深度学习调参总结/"
+           data-title="深度学习调参总结（持续更新中）" data-url="https://xdrush.github.io/2017/03/25/深度学习调参总结/">
       </div>
     
   </div>
@@ -552,7 +578,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-背景说明"><span class="nav-number">1.</span> <span class="nav-text">1 背景说明</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-ROC含义及其说明"><span class="nav-number">2.</span> <span class="nav-text">2 ROC含义及其说明</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-ROC曲线理解"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 ROC曲线理解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-ROC曲线绘制"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 ROC曲线绘制</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-AUC计算及其理解"><span class="nav-number">3.</span> <span class="nav-text">3 AUC计算及其理解</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-AUC计算"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 AUC计算</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-AUC理解"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 AUC理解</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-说明"><span class="nav-number">1.</span> <span class="nav-text">1 说明</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-深度学习调参总结"><span class="nav-number">2.</span> <span class="nav-text">2 深度学习调参总结</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-养成良好的编码习惯"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 养成良好的编码习惯</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-画出模型结构图"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 画出模型结构图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-调参由粗粒度到细粒度"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 调参由粗粒度到细粒度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-4-先在小数据集上做尝试"><span class="nav-number">2.4.</span> <span class="nav-text">2.4 先在小数据集上做尝试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-5-常用超参数探索方式"><span class="nav-number">2.5.</span> <span class="nav-text">2.5 常用超参数探索方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-6-一些基本的经验参数"><span class="nav-number">2.6.</span> <span class="nav-text">2.6 一些基本的经验参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-7-自动调参"><span class="nav-number">2.7.</span> <span class="nav-text">2.7 自动调参</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-8-参数初始化"><span class="nav-number">2.8.</span> <span class="nav-text">2.8 参数初始化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-9-模型融合"><span class="nav-number">2.9.</span> <span class="nav-text">2.9 模型融合</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-10-To-Be-Continued…"><span class="nav-number">2.10.</span> <span class="nav-text">2.10 To Be Continued…</span></a></li></ol></li></ol></div>
             
 
           </div>
