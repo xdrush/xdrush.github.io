@@ -84,13 +84,13 @@
 
 
 
-<meta name="description" content="1 背景说明Neural Factorization Machine（以下简称NFM）是最近由新加坡国立大学的Xiangnan He等人提出，并发表在SIGIR2017上的一篇文章。 这篇文章结合了神经网络和FM的思想，并且创造性的提出将FM的隐向量参与到神经网络的训练中去，同其他的以FM预先训练好再提供给神经网络相比，能有效的提升CTR。下面就对这篇文章做一个总结。 2 NFM基本思想如作者所讲">
+<meta name="description" content="1 背景说明Neural Factorization Machine（以下简称NFM）是最近由新加坡国立大学的Xiangnan He等人提出，并发表在SIGIR2017上的一篇文章。 这篇文章结合了神经网络和FM的思想，并且创造性的提出将FM的隐向量参与到神经网络的训练中去，同其他的以FM预先训练好再提供给神经网络相比，能有效的提升CTR。下面就对这篇文章做一个总结。">
 <meta name="keywords" content="深度学习">
 <meta property="og:type" content="article">
 <meta property="og:title" content="深度学习在CTR预估中的应用之Neural FM">
 <meta property="og:url" content="https://xdrush.github.io/2017/10/25/深度学习在CTR预估中的应用之Neural FM/index.html">
 <meta property="og:site_name" content="XDRush">
-<meta property="og:description" content="1 背景说明Neural Factorization Machine（以下简称NFM）是最近由新加坡国立大学的Xiangnan He等人提出，并发表在SIGIR2017上的一篇文章。 这篇文章结合了神经网络和FM的思想，并且创造性的提出将FM的隐向量参与到神经网络的训练中去，同其他的以FM预先训练好再提供给神经网络相比，能有效的提升CTR。下面就对这篇文章做一个总结。 2 NFM基本思想如作者所讲">
+<meta property="og:description" content="1 背景说明Neural Factorization Machine（以下简称NFM）是最近由新加坡国立大学的Xiangnan He等人提出，并发表在SIGIR2017上的一篇文章。 这篇文章结合了神经网络和FM的思想，并且创造性的提出将FM的隐向量参与到神经网络的训练中去，同其他的以FM预先训练好再提供给神经网络相比，能有效的提升CTR。下面就对这篇文章做一个总结。">
 <meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/FM%E8%A1%A8%E8%BE%BE%E5%BC%8F.png">
 <meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/NFM%E9%A2%84%E4%BC%B0%E8%A1%A8%E8%BE%BE%E5%BC%8F.png">
 <meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/NFM%E6%A8%A1%E5%9E%8B%E7%BB%93%E6%9E%84.png">
@@ -107,10 +107,10 @@
 <meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/mini-batch-SGD.png">
 <meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/Bi-Interaction%E5%8F%82%E6%95%B0%E6%9B%B4%E6%96%B0.png">
 <meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/bn%E8%A1%A8%E8%BE%BE%E5%BC%8F.png">
-<meta property="og:updated_time" content="2018-01-13T08:17:00.395Z">
+<meta property="og:updated_time" content="2018-01-13T08:20:27.679Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="深度学习在CTR预估中的应用之Neural FM">
-<meta name="twitter:description" content="1 背景说明Neural Factorization Machine（以下简称NFM）是最近由新加坡国立大学的Xiangnan He等人提出，并发表在SIGIR2017上的一篇文章。 这篇文章结合了神经网络和FM的思想，并且创造性的提出将FM的隐向量参与到神经网络的训练中去，同其他的以FM预先训练好再提供给神经网络相比，能有效的提升CTR。下面就对这篇文章做一个总结。 2 NFM基本思想如作者所讲">
+<meta name="twitter:description" content="1 背景说明Neural Factorization Machine（以下简称NFM）是最近由新加坡国立大学的Xiangnan He等人提出，并发表在SIGIR2017上的一篇文章。 这篇文章结合了神经网络和FM的思想，并且创造性的提出将FM的隐向量参与到神经网络的训练中去，同其他的以FM预先训练好再提供给神经网络相比，能有效的提升CTR。下面就对这篇文章做一个总结。">
 <meta name="twitter:image" content="http://7xtapc.com2.z0.glb.clouddn.com/FM%E8%A1%A8%E8%BE%BE%E5%BC%8F.png">
 
 
@@ -368,6 +368,7 @@
       
         <h1 id="1-背景说明"><a href="#1-背景说明" class="headerlink" title="1 背景说明"></a>1 背景说明</h1><p><a href="http://www.comp.nus.edu.sg/~xiangnan/papers/sigir17-nfm.pdf" target="_blank" rel="external">Neural Factorization Machine（以下简称NFM）</a>是最近由新加坡国立大学的Xiangnan He等人提出，并发表在SIGIR2017上的一篇文章。</p>
 <p>这篇文章结合了神经网络和FM的思想，并且创造性的提出将FM的隐向量参与到神经网络的训练中去，同其他的以FM预先训练好再提供给神经网络相比，能有效的提升CTR。下面就对这篇文章做一个总结。</p>
+<a id="more"></a>
 <h1 id="2-NFM基本思想"><a href="#2-NFM基本思想" class="headerlink" title="2 NFM基本思想"></a>2 NFM基本思想</h1><p>如作者所讲，这篇文章的贡献在于：</p>
 <blockquote>
 <ul>
