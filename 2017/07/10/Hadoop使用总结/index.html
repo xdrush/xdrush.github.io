@@ -92,7 +92,8 @@
 <meta property="og:site_name" content="XDRush">
 <meta property="og:description" content="1 说明随着大数据的发展，熟练掌握Hadoop和hadoop streaming已成为一个深度学习/机器学习工程师必备的技能。下面将自己在工作过程中接触到的hadoop streaming技巧做个记录，并持续更新中。">
 <meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/KeyFieldBasedPartitioner%E5%8F%82%E6%95%B0%E5%88%97%E8%A1%A8.png">
-<meta property="og:updated_time" content="2018-01-03T14:25:37.793Z">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/hadoop-test.png">
+<meta property="og:updated_time" content="2018-01-17T14:58:38.866Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Hadoop streaming使用总结（持续更新）">
 <meta name="twitter:description" content="1 说明随着大数据的发展，熟练掌握Hadoop和hadoop streaming已成为一个深度学习/机器学习工程师必备的技能。下面将自己在工作过程中接触到的hadoop streaming技巧做个记录，并持续更新中。">
@@ -305,7 +306,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Дата создания записи" itemprop="dateCreated datePublished" datetime="2017-07-10T17:05:39+08:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-07-10T17:05:39+08:00">
                 2017-07-10
               </time>
             
@@ -375,6 +376,15 @@
 <p>需要使用KEY中的第二个字段和第三个字段一起做partition，参数使用如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">-D mapred.text.key.partitioner.options=-2,3</div></pre></td></tr></table></figure></p>
 <p>KeyFieldBasePartitioner的使用只会影响分桶并不会直接影响排序，例如指定了自定义partition参数mapred.text.key.partitioner.options=-2,3，那么KEY中第二字段和第三字段相同的记录一定会被分桶到相同的redcue中。</p>
 <p>注意：参数mapred.text.key.partitioner.options和num.key.fields.for.partition不需要一起使用，一起使用则以num.key.fields.for.partition为准。</p>
+<h2 id="2-2-Hadoop获取mapper输入文件名"><a href="#2-2-Hadoop获取mapper输入文件名" class="headerlink" title="2.2 Hadoop获取mapper输入文件名"></a>2.2 Hadoop获取mapper输入文件名</h2><p>有时候我们在处理Hadoop任务时，不同输入文件的格式可能不一样，这时需要针对不同的文件做不同的处理。一个简单的区分文件方法就是获取输入文件名，根据文件名来做区分。</p>
+<p>如果用python来写mapper，通过下面代码就可以获取输入mapper的文件名：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">path = os.environ[<span class="string">"map_input_file"</span>]</div></pre></td></tr></table></figure></p>
+<p>如果用awk来下mapper，则可以通过下面的方式获取文件名：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span>(match(ENVIRON[<span class="string">"map_input_file"</span>], <span class="string">"rid_file"</span>))</div></pre></td></tr></table></figure></p>
+<p>不同的hadoop版本可能对应的key不一样，比如这个版本中的key是”map_input_file”；有些版本中的key可能是ENVIRON[“mapreduce_map_input_file”]，具体版本可以查阅相关资料。</p>
+<p>通过environ获取的文件名是HDFS下的完整路径：<br>hdfs://benz.hadoop.platform.sogou:18310/context/personal/xudong/test_dir</p>
+<h2 id="2-3-合理利用test命令"><a href="#2-3-合理利用test命令" class="headerlink" title="2.3 合理利用test命令"></a>2.3 合理利用test命令</h2><p>Hadoop fs -test -e命令用于检测HDFS上的文件是否存在，有时我们在线下执行crontab定时任务时，需要先检测HDFS上的文件是否存在，再决定后续处理逻辑，以防对先上服务造成影响。执行命令为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">hadoop fs -test -e HDFS_file_dir</div></pre></td></tr></table></figure></p>
+<p>返回值为0表示文件存在，为1表示文件不存在：<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/hadoop-test.png" alt="hadoop test命令"></p>
+<p>比如，/context/personal/xudong/test_dir文件存在，那么返回值就是0；<br>/context/personal/xudong/test_dir_xxx文件不存在，那么返回值就是1；</p>
+<p>有些时候在线下流程中中，需要先判断HDFS文件是否生成，如果生成，继续执行后面操作；如果没有生成，则可能需要加入重试机制判断文件是否生成。比如像下面这样：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">for ((try_cnt=0;try_cnt&lt;100;++try_cnt))</div><div class="line">    do</div><div class="line">        $&#123;HADOOP&#125; fs -test -e $&#123;BASE_DIR&#125;/$&#123;DATE&#125;.done</div><div class="line">        if [ $? -eq 0 ]</div><div class="line">        then</div><div class="line">            break</div><div class="line">        fi</div><div class="line">        </div><div class="line">        if [ $&#123;try_cnt&#125; -gt 10 ]</div><div class="line">        then</div><div class="line">            echo &quot;data of $&#123;DATE&#125; not ready&quot;</div><div class="line">        fi</div><div class="line">        echo &quot;try to fetch $&#123;BASE_DIR&#125;/$&#123;DATE&#125;.done $&#123;try_cnt&#125; times&quot;</div><div class="line">        sleep 300</div><div class="line">    done</div></pre></td></tr></table></figure></p>
 
       
     </div>
@@ -493,7 +503,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">33</span>
+                <span class="site-state-item-count">34</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -546,7 +556,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-说明"><span class="nav-number">1.</span> <span class="nav-text">1 说明</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-Hadoop应用技巧"><span class="nav-number">2.</span> <span class="nav-text">2 Hadoop应用技巧</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-Hadoop-streaming实现二次排序"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 Hadoop streaming实现二次排序</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-说明"><span class="nav-number">1.</span> <span class="nav-text">1 说明</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-Hadoop应用技巧"><span class="nav-number">2.</span> <span class="nav-text">2 Hadoop应用技巧</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-Hadoop-streaming实现二次排序"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 Hadoop streaming实现二次排序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-Hadoop获取mapper输入文件名"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 Hadoop获取mapper输入文件名</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-合理利用test命令"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 合理利用test命令</span></a></li></ol></li></ol></div>
             
 
           </div>

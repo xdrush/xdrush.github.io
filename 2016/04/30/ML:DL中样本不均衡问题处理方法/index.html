@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="读书笔记," />
+  <meta name="keywords" content="深度学习," />
 
 
 
@@ -84,17 +84,17 @@
 
 
 
-<meta name="description" content="这本书是钱穆的专题演讲合集，分别就中国汉、唐、宋、明、清五代的政府组织、百官职权、考试监察、财政赋税、兵役义务等种种政治制度做了提要钩玄的概观和比照，高屋建瓴，气势恢弘。">
-<meta name="keywords" content="读书笔记">
+<meta name="description" content="1 背景说明机器学习或者深度学习中常常会遇到数据的类别不平衡（class imbalance），也叫数据偏斜（class skew）。以常见的二分类问题为例，我们希望预测病人是否得了某种罕见疾病。但在历史数据中，阳性的比例可能很低（如百分之0.1）。在这种情况下，学习出好的分类器是很难的，而且在这种情况下得到结论往往也是很具迷惑性的。再比如在CTR预估中，WAP上的CTR通常在千分之几，APP上C">
+<meta name="keywords" content="深度学习">
 <meta property="og:type" content="article">
-<meta property="og:title" content="读书笔记之《中国历代政治得失》">
-<meta property="og:url" content="https://xdrush.github.io/2016/03/21/读书笔记之《中国历代政治得失》/index.html">
+<meta property="og:title" content="ML&#x2F;DL中样本不均衡问题处理方式">
+<meta property="og:url" content="https://xdrush.github.io/2016/04/30/ML:DL中样本不均衡问题处理方法/index.html">
 <meta property="og:site_name" content="XDRush">
-<meta property="og:description" content="这本书是钱穆的专题演讲合集，分别就中国汉、唐、宋、明、清五代的政府组织、百官职权、考试监察、财政赋税、兵役义务等种种政治制度做了提要钩玄的概观和比照，高屋建瓴，气势恢弘。">
-<meta property="og:updated_time" content="2017-12-16T03:05:34.000Z">
+<meta property="og:description" content="1 背景说明机器学习或者深度学习中常常会遇到数据的类别不平衡（class imbalance），也叫数据偏斜（class skew）。以常见的二分类问题为例，我们希望预测病人是否得了某种罕见疾病。但在历史数据中，阳性的比例可能很低（如百分之0.1）。在这种情况下，学习出好的分类器是很难的，而且在这种情况下得到结论往往也是很具迷惑性的。再比如在CTR预估中，WAP上的CTR通常在千分之几，APP上C">
+<meta property="og:updated_time" content="2018-01-17T15:46:05.478Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="读书笔记之《中国历代政治得失》">
-<meta name="twitter:description" content="这本书是钱穆的专题演讲合集，分别就中国汉、唐、宋、明、清五代的政府组织、百官职权、考试监察、财政赋税、兵役义务等种种政治制度做了提要钩玄的概观和比照，高屋建瓴，气势恢弘。">
+<meta name="twitter:title" content="ML&#x2F;DL中样本不均衡问题处理方式">
+<meta name="twitter:description" content="1 背景说明机器学习或者深度学习中常常会遇到数据的类别不平衡（class imbalance），也叫数据偏斜（class skew）。以常见的二分类问题为例，我们希望预测病人是否得了某种罕见疾病。但在历史数据中，阳性的比例可能很低（如百分之0.1）。在这种情况下，学习出好的分类器是很难的，而且在这种情况下得到结论往往也是很具迷惑性的。再比如在CTR预估中，WAP上的CTR通常在千分之几，APP上C">
 
 
 
@@ -122,13 +122,13 @@
 
 
 
-  <link rel="canonical" href="https://xdrush.github.io/2016/03/21/读书笔记之《中国历代政治得失》/"/>
+  <link rel="canonical" href="https://xdrush.github.io/2016/04/30/ML:DL中样本不均衡问题处理方法/"/>
 
 
 
 
 
-  <title> 读书笔记之《中国历代政治得失》 | XDRush </title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  <title> ML/DL中样本不均衡问题处理方式 | XDRush </title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -264,7 +264,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xdrush.github.io/2016/03/21/读书笔记之《中国历代政治得失》/">
+  <link itemprop="mainEntityOfPage" href="https://xdrush.github.io/2016/04/30/ML:DL中样本不均衡问题处理方法/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="Dong Xu">
@@ -288,7 +288,7 @@
             
             
               
-                读书笔记之《中国历代政治得失》
+                ML/DL中样本不均衡问题处理方式
               
             
           </h1>
@@ -303,8 +303,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-03-21T22:36:39+08:00">
-                2016-03-21
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-04-30T17:05:39+08:00">
+                2016-04-30
               </time>
             
 
@@ -322,8 +322,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2016/03/21/读书笔记之《中国历代政治得失》/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/03/21/读书笔记之《中国历代政治得失》/" itemprop="commentCount"></span>
+                <a href="/2016/04/30/ML:DL中样本不均衡问题处理方法/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/30/ML:DL中样本不均衡问题处理方法/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -349,15 +349,50 @@
       
 
       
-        <p>这本书是钱穆的专题演讲合集，分别就中国汉、唐、宋、明、清五代的政府组织、百官职权、考试监察、财政赋税、兵役义务等种种政治制度做了提要钩玄的概观和比照，高屋建瓴，气势恢弘。<br><a id="more"></a></p>
-<p>说来也巧，这本书是某当一次拼单实在是差十几块钱偶然看到的，定价24打完折十几块钱在现在动辄几十块钱的图书市场实在是良心作品。最初知道钱穆，是宇同学向我推荐，那时正想着看些历史书，他就索性给我推荐了黄仁宇和钱穆这俩人，后也断断续续度过若干这两位作品，观点独到，自成一家之言，可读性很强。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>从两千年的历史中，我们可以对以往传统政治，找出几条大趋势。</p>
-<p>第一：中央政府有逐步集权的倾向。这丛某一方面讲是好的，一个国家该要有一个凝固的中央。政治进步，政权自然集中，任何国家都走这条路。开始是封建，四分五裂，满满地就统一集中。</p>
-<p>第二：可以说中国历史上的传统政治，已造成了社会各阶层一天天趋向于平等。</p>
-<p>第三：长治久安，是人人希望的，可是在这种情形下的知识分子，至多也只能维持上三代（注：笔者很小时候便常听老一辈说富不过三代，大抵如此）。对于这点，倒觉得与现代社会有些偏差，不敢苟同。</p>
-<p>第四：是中国的政治制度，相沿日久，一天天地繁密化。一个制度出了毛病，再订一个制度来防制它，于是有些却变成了病上加病。制度愈繁密，人才愈束缚。</p>
-<p>至于文中详细对于各个朝代政治制度的对比，这里不作详述，书中有详述。</p>
-<p>是为2017年5月读书笔记，2017年6月读《清教徒的礼物》。</p>
+        <h1 id="1-背景说明"><a href="#1-背景说明" class="headerlink" title="1 背景说明"></a>1 背景说明</h1><p>机器学习或者深度学习中常常会遇到数据的类别不平衡（class imbalance），也叫数据偏斜（class skew）。以常见的二分类问题为例，我们希望预测病人是否得了某种罕见疾病。但在历史数据中，阳性的比例可能很低（如百分之0.1）。在这种情况下，学习出好的分类器是很难的，而且在这种情况下得到结论往往也是很具迷惑性的。再比如在CTR预估中，WAP上的CTR通常在千分之几，APP上CTR也就百分之一二，意味着PV远远要大于Click。</p>
+<a id="more"></a>
+<p>以上面提到的场景来说，如果我们的分类器总是预测一个人未患病，即预测为反例，那么我们依然有高达99.9%的预测准确率。然而这种结果是没有意义的，那么有效在数据不平衡的情况下评估分类器呢？</p>
+<p>当然，本文最终希望解决的问题是：在数据偏斜的情况下，如何得到一个不错的分类器？如果可能，是否可以找到一个较为简单的解决方法，而规避复杂的模型、数据处理，降低我们的工作量。</p>
+<h1 id="2-数据不平衡情况下模型的评估"><a href="#2-数据不平衡情况下模型的评估" class="headerlink" title="2 数据不平衡情况下模型的评估"></a>2 数据不平衡情况下模型的评估</h1><p>对于平衡的数据，我们一般都用准确率（accuracy），也就是（1-误分率）作为一般的评估标准。这种标准的默认假设前提是：“数据是平衡的，正例与反例的重要性一样，二分类器的阈值是0.5。”在这种情况下，用准确率来对分类器进行评估是合理的。</p>
+<p>而当数据不平衡时，准确率就非常具有迷惑性，而且意义不大。下面给出几种主流的评估方法：</p>
+<blockquote>
+<ul>
+<li>ROC是一种常见的替代方法，全名receiver operating curve，计算ROC曲线下的面积是一种主流方法</li>
+<li>Precision-recall curve和ROC有相似的地方，但定义不同，计算此曲线下的面积也是一种方法</li>
+<li>Precision@n是另一种方法，是指将分类阈值设定得到恰好n个正例时分类器的precision</li>
+<li>Average precision也叫做平均精度，主要描述了precision的一般表现，在异常检测中有时候会用</li>
+<li>直接使用Precision也是一种想法，但此时的假设是分类器的阈值是0.5，因此意义不大</li>
+</ul>
+</blockquote>
+<p>至于哪种方法更好，一般来看我们在极端数据不平衡中更在意“少数的类别”，因此ROC不像precision-recall curve那样更具有吸引力。在这种情况下，Precision-recall curve不失为一种好的评估标准。还有一种做法是，仅分析ROC曲线左边的一小部分，从这个角度看和precision-recall curve有很高的相似性。</p>
+<p>同理，因为我们更在意罕见的正例，因此precision尤为重要，因此average precision （macro）也是常见的评估标准。此处特意要提醒两点：（1）没有特殊情况，不要用准确率（accuracy），一般都没什么帮助。（2）如果使用precision，请注意调整分类阈值，precision@n更有意义。</p>
+<h1 id="3-如何处理数据不均衡问题"><a href="#3-如何处理数据不均衡问题" class="headerlink" title="3 如何处理数据不均衡问题"></a>3 如何处理数据不均衡问题</h1><p>对于数据不平衡的研究已经有很多年了，下面结合我的了解举几个简单的例子：</p>
+<blockquote>
+<ul>
+<li>对数据进行采用的过程中通过相似性同时生成并插样“少数类别数据”，叫做SMOTE算法</li>
+<li>对数据先进行聚类，再将大的簇进行随机欠采样或者小的簇进行数据生成</li>
+<li>把监督学习变为无监督学习，舍弃掉标签把问题转化为一个无监督问题，如异常检测</li>
+<li>先对多数类别进行随机的欠采样，并结合boosting算法进行集成学习</li>
+</ul>
+</blockquote>
+<p>上面提到的算法比较偏理论，实际应用中的最简单的算法无外乎三种：</p>
+<blockquote>
+<ul>
+<li>对较多的那个类别进行欠采样(under-sampling)，舍弃一部分数据，使其与较少类别的数据相当；</li>
+<li>对较少的类别进行过采样(over-sampling)，重复使用一部分数据，使其与较多类别的数据相当；</li>
+<li>阈值调整（threshold moving），将原本默认为0.5的阈值调整到 较少类别/（较少类别+较多类别）即可;</li>
+</ul>
+</blockquote>
+<p>当然很明显我们可以看出，第一种和第二种方法都会明显的改变数据分布，我们的训练数据假设不再是真实数据的无偏表述。在第一种方法中，我们浪费了很多数据。而第二类方法中有无中生有或者重复使用了数据，会导致过拟合的发生。</p>
+<p>因此欠采样的逻辑中往往会结合集成学习来有效的使用数据，假设正例数据n，而反例数据m个。我们可以通过欠采样，随机无重复的生成（k=n/m）个反例子集，并将每个子集都与相同正例数据合并生成k个新的训练样本。我们在k个训练样本上分别训练一个分类器，最终将k个分类器的结果结合起来，比如求平均值。</p>
+<p>但不难看出，其实这样的过程是需要花时间处理数据和编程的，对于很多知识和能力有限的人来说难度比较大。特此推荐两个简单易行且效果中上的做法：</p>
+<blockquote>
+<ul>
+<li>简单的调整阈值，不对数据进行任何处理。此处特指将分类阈值从0.5调整到正例比例；</li>
+<li>使用现有的集成学习分类器，如随机森林或者xgboost，并调整分类阈值;</li>
+</ul>
+</blockquote>
+<p>以上总结是个人的一些思考以及前人的一些总结，仅供参考。</p>
 
       
     </div>
@@ -381,7 +416,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/读书笔记/" rel="tag"># 读书笔记</a>
+            <a href="/tags/深度学习/" rel="tag"># 深度学习</a>
           
         </div>
       
@@ -390,8 +425,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/03/15/使用Retrofit下载文件/" rel="next" title="使用Retrofit下载文件">
-                <i class="fa fa-chevron-left"></i> 使用Retrofit下载文件
+              <a href="/2016/04/27/ActivityThread & Instrumentation在MultiDex实现中的应用/" rel="next" title="ActivityThread & Instrumentation在MultiDex实现中的应用">
+                <i class="fa fa-chevron-left"></i> ActivityThread & Instrumentation在MultiDex实现中的应用
               </a>
             
           </div>
@@ -400,8 +435,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2016/03/30/一篇文章带你了解Android之Gradle/" rel="prev" title="一篇文章带你了解Android之Gradle">
-                一篇文章带你了解Android之Gradle <i class="fa fa-chevron-right"></i>
+              <a href="/2016/05/04/ubuntu下Boost.Python环境配置/" rel="prev" title="ubuntu下Boost.Python环境配置">
+                ubuntu下Boost.Python环境配置 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -428,8 +463,8 @@
           
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2016/03/21/读书笔记之《中国历代政治得失》/"
-           data-title="读书笔记之《中国历代政治得失》" data-url="https://xdrush.github.io/2016/03/21/读书笔记之《中国历代政治得失》/">
+      <div class="ds-thread" data-thread-key="2016/04/30/ML:DL中样本不均衡问题处理方法/"
+           data-title="ML/DL中样本不均衡问题处理方式" data-url="https://xdrush.github.io/2016/04/30/ML:DL中样本不均衡问题处理方法/">
       </div>
     
   </div>
@@ -529,7 +564,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">1.</span> <span class="nav-text">总结</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-背景说明"><span class="nav-number">1.</span> <span class="nav-text">1 背景说明</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-数据不平衡情况下模型的评估"><span class="nav-number">2.</span> <span class="nav-text">2 数据不平衡情况下模型的评估</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-如何处理数据不均衡问题"><span class="nav-number">3.</span> <span class="nav-text">3 如何处理数据不均衡问题</span></a></li></ol></div>
             
 
           </div>
