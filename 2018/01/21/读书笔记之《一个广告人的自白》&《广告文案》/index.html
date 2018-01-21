@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="深度学习," />
+  <meta name="keywords" content="读书笔记," />
 
 
 
@@ -84,17 +84,17 @@
 
 
 
-<meta name="description" content="1 背景说明机器学习或者深度学习中常常会遇到数据的类别不平衡（class imbalance），也叫数据偏斜（class skew）。以常见的二分类问题为例，我们希望预测病人是否得了某种罕见疾病。但在历史数据中，阳性的比例可能很低（如百分之0.1）。在这种情况下，学习出好的分类器是很难的，而且在这种情况下得到结论往往也是很具迷惑性的。再比如在CTR预估中，WAP上的CTR通常在千分之几，APP上C">
-<meta name="keywords" content="深度学习">
+<meta name="description" content="鉴于近期所做的工作性质的原因，就想系统了解下广告创意创作相关的理论知识。缘由是因为我发现，在做创意优化时，实际的广告CTR、cpm同自己的预期并不一致，刚好最近上了两门课《以用户为中心的产品方法论》和《MVP方法论》，于是就想一探究竟，创意到底会如何影响效果广告的效果的。">
+<meta name="keywords" content="读书笔记">
 <meta property="og:type" content="article">
-<meta property="og:title" content="ML&#x2F;DL中样本不均衡问题处理方式">
-<meta property="og:url" content="https://xdrush.github.io/2016/04/30/ML:DL中样本不均衡问题处理方法/index.html">
+<meta property="og:title" content="读书笔记之《一个广告人的自白》&amp;《广告文案》">
+<meta property="og:url" content="https://xdrush.github.io/2018/01/21/读书笔记之《一个广告人的自白》&《广告文案》/index.html">
 <meta property="og:site_name" content="XDRush">
-<meta property="og:description" content="1 背景说明机器学习或者深度学习中常常会遇到数据的类别不平衡（class imbalance），也叫数据偏斜（class skew）。以常见的二分类问题为例，我们希望预测病人是否得了某种罕见疾病。但在历史数据中，阳性的比例可能很低（如百分之0.1）。在这种情况下，学习出好的分类器是很难的，而且在这种情况下得到结论往往也是很具迷惑性的。再比如在CTR预估中，WAP上的CTR通常在千分之几，APP上C">
-<meta property="og:updated_time" content="2018-01-17T15:46:05.478Z">
+<meta property="og:description" content="鉴于近期所做的工作性质的原因，就想系统了解下广告创意创作相关的理论知识。缘由是因为我发现，在做创意优化时，实际的广告CTR、cpm同自己的预期并不一致，刚好最近上了两门课《以用户为中心的产品方法论》和《MVP方法论》，于是就想一探究竟，创意到底会如何影响效果广告的效果的。">
+<meta property="og:updated_time" content="2018-01-21T15:11:11.713Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="ML&#x2F;DL中样本不均衡问题处理方式">
-<meta name="twitter:description" content="1 背景说明机器学习或者深度学习中常常会遇到数据的类别不平衡（class imbalance），也叫数据偏斜（class skew）。以常见的二分类问题为例，我们希望预测病人是否得了某种罕见疾病。但在历史数据中，阳性的比例可能很低（如百分之0.1）。在这种情况下，学习出好的分类器是很难的，而且在这种情况下得到结论往往也是很具迷惑性的。再比如在CTR预估中，WAP上的CTR通常在千分之几，APP上C">
+<meta name="twitter:title" content="读书笔记之《一个广告人的自白》&amp;《广告文案》">
+<meta name="twitter:description" content="鉴于近期所做的工作性质的原因，就想系统了解下广告创意创作相关的理论知识。缘由是因为我发现，在做创意优化时，实际的广告CTR、cpm同自己的预期并不一致，刚好最近上了两门课《以用户为中心的产品方法论》和《MVP方法论》，于是就想一探究竟，创意到底会如何影响效果广告的效果的。">
 
 
 
@@ -122,13 +122,13 @@
 
 
 
-  <link rel="canonical" href="https://xdrush.github.io/2016/04/30/ML:DL中样本不均衡问题处理方法/"/>
+  <link rel="canonical" href="https://xdrush.github.io/2018/01/21/读书笔记之《一个广告人的自白》&《广告文案》/"/>
 
 
 
 
 
-  <title> ML/DL中样本不均衡问题处理方式 | XDRush </title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  <title> 读书笔记之《一个广告人的自白》&《广告文案》 | XDRush </title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -264,7 +264,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://xdrush.github.io/2016/04/30/ML:DL中样本不均衡问题处理方法/">
+  <link itemprop="mainEntityOfPage" href="https://xdrush.github.io/2018/01/21/读书笔记之《一个广告人的自白》&《广告文案》/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="Dong Xu">
@@ -288,7 +288,7 @@
             
             
               
-                ML/DL中样本不均衡问题处理方式
+                读书笔记之《一个广告人的自白》&《广告文案》
               
             
           </h1>
@@ -303,8 +303,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-04-30T17:05:39+08:00">
-                2016-04-30
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-01-21T22:56:39+08:00">
+                2018-01-21
               </time>
             
 
@@ -322,8 +322,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2016/04/30/ML:DL中样本不均衡问题处理方法/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/30/ML:DL中样本不均衡问题处理方法/" itemprop="commentCount"></span>
+                <a href="/2018/01/21/读书笔记之《一个广告人的自白》&《广告文案》/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/01/21/读书笔记之《一个广告人的自白》&《广告文案》/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -349,50 +349,48 @@
       
 
       
-        <h1 id="1-背景说明"><a href="#1-背景说明" class="headerlink" title="1 背景说明"></a>1 背景说明</h1><p>机器学习或者深度学习中常常会遇到数据的类别不平衡（class imbalance），也叫数据偏斜（class skew）。以常见的二分类问题为例，我们希望预测病人是否得了某种罕见疾病。但在历史数据中，阳性的比例可能很低（如百分之0.1）。在这种情况下，学习出好的分类器是很难的，而且在这种情况下得到结论往往也是很具迷惑性的。再比如在CTR预估中，WAP上的CTR通常在千分之几，APP上CTR也就百分之一二，意味着PV远远要大于Click。</p>
+        <p>鉴于近期所做的工作性质的原因，就想系统了解下广告创意创作相关的理论知识。缘由是因为我发现，在做创意优化时，实际的广告CTR、cpm同自己的预期并不一致，刚好最近上了两门课《以用户为中心的产品方法论》和《MVP方法论》，于是就想一探究竟，创意到底会如何影响效果广告的效果的。</p>
 <a id="more"></a>
-<p>以上面提到的场景来说，如果我们的分类器总是预测一个人未患病，即预测为反例，那么我们依然有高达99.9%的预测准确率。然而这种结果是没有意义的，那么有效在数据不平衡的情况下评估分类器呢？</p>
-<p>当然，本文最终希望解决的问题是：在数据偏斜的情况下，如何得到一个不错的分类器？如果可能，是否可以找到一个较为简单的解决方法，而规避复杂的模型、数据处理，降低我们的工作量。</p>
-<h1 id="2-数据不平衡情况下模型的评估"><a href="#2-数据不平衡情况下模型的评估" class="headerlink" title="2 数据不平衡情况下模型的评估"></a>2 数据不平衡情况下模型的评估</h1><p>对于平衡的数据，我们一般都用准确率（accuracy），也就是（1-误分率）作为一般的评估标准。这种标准的默认假设前提是：“数据是平衡的，正例与反例的重要性一样，二分类器的阈值是0.5。”在这种情况下，用准确率来对分类器进行评估是合理的。</p>
-<p>而当数据不平衡时，准确率就非常具有迷惑性，而且意义不大。下面给出几种主流的评估方法：</p>
-<blockquote>
-<ul>
-<li>ROC是一种常见的替代方法，全名receiver operating curve，计算ROC曲线下的面积是一种主流方法</li>
-<li>Precision-recall curve和ROC有相似的地方，但定义不同，计算此曲线下的面积也是一种方法</li>
-<li>Precision@n是另一种方法，是指将分类阈值设定得到恰好n个正例时分类器的precision</li>
-<li>Average precision也叫做平均精度，主要描述了precision的一般表现，在异常检测中有时候会用</li>
-<li>直接使用Precision也是一种想法，但此时的假设是分类器的阈值是0.5，因此意义不大</li>
-</ul>
-</blockquote>
-<p>至于哪种方法更好，一般来看我们在极端数据不平衡中更在意“少数的类别”，因此ROC不像precision-recall curve那样更具有吸引力。在这种情况下，Precision-recall curve不失为一种好的评估标准。还有一种做法是，仅分析ROC曲线左边的一小部分，从这个角度看和precision-recall curve有很高的相似性。</p>
-<p>同理，因为我们更在意罕见的正例，因此precision尤为重要，因此average precision （macro）也是常见的评估标准。此处特意要提醒两点：（1）没有特殊情况，不要用准确率（accuracy），一般都没什么帮助。（2）如果使用precision，请注意调整分类阈值，precision@n更有意义。</p>
-<h1 id="3-如何处理数据不均衡问题"><a href="#3-如何处理数据不均衡问题" class="headerlink" title="3 如何处理数据不均衡问题"></a>3 如何处理数据不均衡问题</h1><p>对于数据不平衡的研究已经有很多年了，下面结合我的了解举几个简单的例子：</p>
-<blockquote>
-<ul>
-<li>对数据进行采用的过程中通过相似性同时生成并插样“少数类别数据”，叫做SMOTE算法</li>
-<li>对数据先进行聚类，再将大的簇进行随机欠采样或者小的簇进行数据生成</li>
-<li>把监督学习变为无监督学习，舍弃掉标签把问题转化为一个无监督问题，如异常检测</li>
-<li>先对多数类别进行随机的欠采样，并结合boosting算法进行集成学习</li>
-</ul>
-</blockquote>
-<p>上面提到的算法比较偏理论，实际应用中的最简单的算法无外乎三种：</p>
-<blockquote>
-<ul>
-<li>对较多的那个类别进行欠采样(under-sampling)，舍弃一部分数据，使其与较少类别的数据相当；</li>
-<li>对较少的类别进行过采样(over-sampling)，重复使用一部分数据，使其与较多类别的数据相当；</li>
-<li>阈值调整（threshold moving），将原本默认为0.5的阈值调整到 较少类别/（较少类别+较多类别）即可;</li>
-</ul>
-</blockquote>
-<p>当然很明显我们可以看出，第一种和第二种方法都会明显的改变数据分布，我们的训练数据假设不再是真实数据的无偏表述。在第一种方法中，我们浪费了很多数据。而第二类方法中有无中生有或者重复使用了数据，会导致过拟合的发生。</p>
-<p>因此欠采样的逻辑中往往会结合集成学习来有效的使用数据，假设正例数据n，而反例数据m个。我们可以通过欠采样，随机无重复的生成（k=n/m）个反例子集，并将每个子集都与相同正例数据合并生成k个新的训练样本。我们在k个训练样本上分别训练一个分类器，最终将k个分类器的结果结合起来，比如求平均值。</p>
-<p>但不难看出，其实这样的过程是需要花时间处理数据和编程的，对于很多知识和能力有限的人来说难度比较大。特此推荐两个简单易行且效果中上的做法：</p>
-<blockquote>
-<ul>
-<li>简单的调整阈值，不对数据进行任何处理。此处特指将分类阈值从0.5调整到正例比例；</li>
-<li>使用现有的集成学习分类器，如随机森林或者xgboost，并调整分类阈值;</li>
-</ul>
-</blockquote>
-<p>以上总结是个人的一些思考以及前人的一些总结，仅供参考。</p>
+<h1 id="《一个广告人的自白》大卫-奥格威"><a href="#《一个广告人的自白》大卫-奥格威" class="headerlink" title="《一个广告人的自白》大卫-奥格威"></a>《一个广告人的自白》大卫-奥格威</h1><p>最初知道这本书，是我在搜狗参加新人培训时候，公司一为资深产品在给我们上课时，引言用了这本书中的一句话，当时觉得印象颇深。恰好这段时间以来，我自己一直在做搜索广告和信息流广告的创意优化相关的工作，于是想起了这本书，趁着每天上下班坐地铁的功夫，每天翻几十页。</p>
+<p>虽然这本书大部分内容以电视广告和传统的线下广告为主，但书中不少观点仍适用于今天的互联网广告，给我启发不少。现将书中给我较深影响的观点摘录如下：</p>
+<p>如果你经常雇佣比你弱小的人，将来我们就会变成一个侏儒公司。相反的，如果你每次都雇佣比你强大的人，日后我们必定成为一家巨人公司。（招聘人的时候，一定要选优秀的人才）</p>
+<p>正如品酒，快速勾兑的可供一醉，还要当心头疼的后遗症，而经过岁月洗礼的，才是真正的佳酿。</p>
+<p>奥格威还设定了广告高标准的社会责任–讲事实，不欺骗，不要创作你不希望自己家人看到的广告……<br>（广告创意创作的底线和责任）</p>
+<p>我们做广告是为了销售产品，否则就不是做广告。（做广告最基本的目的）</p>
+<p>我们注意保守机密。客户不欣赏泄露他们秘密的广告公司。（商业产品团队基本修养）</p>
+<p><strong>关于怎样经营一家广告公司</strong><br>有创造力的伟人的个性少有平淡无奇的。（要有包容心，容纳性格奇怪的人才）</p>
+<p>最高领导人的最主要的职责在于创造一种让有制作才华的人有用武之地的气氛。（公司的领导，职责明确，各有分工）</p>
+<p>跟一位技艺高超的大师在一起工作，是很能受到鼓舞的。（深有体会，或许这就是气场吧）</p>
+<p><strong>关于怎样当好一个客户</strong><br>若我是客户的话，我定会竭尽全力使我的广告公司从恐惧中解脱出来，甚至为此签订长期合同也在所不惜。（相信伙伴）</p>
+<p>低劣的广告会使产品滞销。（毋庸置疑）</p>
+<p><strong>关于怎样创作高水平的广告</strong><br>经常不断地使用削价促销会降低产品在消费者心目中的声誉。（不能以品牌声誉为代价换去销量的提升）</p>
+<p>改变这种廉价货的老面孔，是指焕然一新是极不容易的事。换一个新牌子推到重来往往更容易以下。（品牌战略，国内很多的手机品牌就是通过这种方式树立起来的）</p>
+<p>面对同类产品不同品牌之间质量差距极其微小的事实，大部分撰稿人的结论是，向消费者讲各种品牌共有的东西是毫无意义的。（宣传时，争夺关键词，在消费者心目中固化关键词和品牌之间的关联）</p>
+<p>消费者不是低能儿，她们是你的妻女。若是你以为一句简单的口号和几个枯燥的形容词就能够诱使他们买你的东西，那你就太低估他们的智能了。（以用户为中心的产品方法论）</p>
+<p>若是你的广告的基础不是上乘的创意，他必遭失败。（创意之于广告的重要性）</p>
+<p>承诺，大大的承诺，是广告的灵魂。（广告中，得向你的消费者承诺什么）</p>
+<p>我认为广告佳作是不引公众注意它自己就把产品推销掉的作品。（伟大广告作品）</p>
+<p><strong>关于怎样写有效力的文案</strong><br>一则广告成功的机会总是随着广告中所含的中肯的商品事实数据量的增加而增加的。（广告讲究事实）</p>
+<p>在标题中你可以使用的最有分量的两个词是“免费”和“新”。使用“免费”的机会不多，但“新”总是可以用上的。（善于抓住消费者的心理）</p>
+<p>标题是大多数平面广告最重要的部分。它是决定读者是不是读正文的关键。（结合自己所做的创意优化的工作，深有感触啊，一个好的标题往往能带来CTR成倍的增加）</p>
+<h1 id="《广告文案》乐剑峰"><a href="#《广告文案》乐剑峰" class="headerlink" title="《广告文案》乐剑峰"></a>《广告文案》乐剑峰</h1><p><strong>广告文案的定义</strong><br>广告文案写作，是一种按要求、有目的的写作，必须经过长期训练与商业实战，才能达到运用自如的境界。</p>
+<p>广告文案的核心，一定是某种承诺，即让消费者从消费中得到某种好处。（广告文案即承诺）</p>
+<p><strong>广告文案基本原则</strong><br>广告诉求讲究单一原则，这样才能被成功记住。</p>
+<p>创意，必须为广告目标而服务；文案，就是为了达成这个目标而使用的工具。<br>可以说，一则广告中所有的文字与图像，都带有强烈的目的性。有的广告为了建立企业形象，有的广告需要介绍产品功能，有的广告只是一次常规促销……这些形形色色的广告目的，都取决于营销过程中的阶段性目标。不管你的创意如何精彩，一旦偏离了这个目标，都逃不了市场的无情制裁。（广告必须服务于确定的目标）</p>
+<p>消费者买到的不只是产品的物质利益，还应该包括心理利益，所以，应该树立清晰、明确的品牌形象，并 将其作为企业的长期投资。</p>
+<p>谁先说出来，消费者就认谁！（同质化产品如何制胜的做法，比如王老吉，“怕上火就喝王老吉”，所有的凉茶产品都有这个属性，但是王老吉最先说出来，所以消费者就认它，“怕上火”和“王老吉”就根深蒂固的绑定在消费者心目中；还比如最近一年比较火的网贷产品，为什么这些公司争先上市呢？原因很简单，谁先上市，谁就在消费者心里树立起靠谱的定位）</p>
+<p>每个广告，都必须提出一个鲜明的、独一无二的产品卖点，才能吸引消费者试用你的产品。（广告的目的在于提出一个鲜明的、独一无二的产品卖点）</p>
+<p>在大多数广告中，无论插图多么精彩，标题都是最为重要的。大多数读者在读过标题后，便会因对其感兴趣或不感兴趣来决定是否继续读下去。（广告标题的重要性）</p>
+<p>消费者会因为利益点买你的产品，也会因为利益点阅读你的广告。（在广告中阐述利益点）</p>
+<p>很多文案成了“标题党”，表现出“语不惊人死不休”的状态。这里所追求的文案“震惊值”，需要因受众而异，如果运用巧妙，的确能让读者为你的构思而啧啧称奇；如果使用不当，便会适得其反。（对当前信息流广告文案的反思，有时将广告标题写成标题党形式并没有带来点击率的提升，那是因为我们是在想当然，我们以为标题质量的提升一定会带来CTR的提升，没有站在用户的立场上）</p>
+<p>切记在标题中说了某种“承诺”，但是在正文中却只字不提。如果你的正文分为几段，那么一定要在第一段里，回应标题中所讲到的某种优点或者承诺。</p>
+<p><strong>关于品牌的重要性</strong><br>如果因为某种原因，需要改变产品的“曾用名”，以新名称面向市场的话，就意味着此前投入的广告费将一笔勾销，所有人都得对你重新认识一番，代价不菲。（所以，对于品牌改名，一定要慎重）</p>
+<p>没有品牌，再高档的酒，也只是一瓶变了味的水。（品牌的重要新）</p>
+<p>品牌，是多次感觉最终的结晶物。</p>
+<p>品牌名称应该便于记忆。如果品牌名称不好记，它就得花费更长的时间、更多的资金投入才能建立起广泛的知名度。（品牌名称的重要性）</p>
+<p>所谓“情怀”，实质是电商文案赋予产品的一种情感价值。</p>
+<p><strong>关于H5文案</strong><br>因为，音乐永远是击倒用户的第一发或者最后一发子弹，需要加大火药量。（H5创意不可忽视音乐的力量）</p>
+<p><strong>关于微信时代的标题</strong><br>微信时代，标题的重要性比起传统广告有过之而无不及。学会总结热门文章标题中的规律，并试着超越，是文案提升撰写水平的不二法门。</p>
 
       
     </div>
@@ -416,7 +414,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/深度学习/" rel="tag"># 深度学习</a>
+            <a href="/tags/读书笔记/" rel="tag"># 读书笔记</a>
           
         </div>
       
@@ -425,8 +423,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/04/27/ActivityThread & Instrumentation在MultiDex实现中的应用/" rel="next" title="ActivityThread & Instrumentation在MultiDex实现中的应用">
-                <i class="fa fa-chevron-left"></i> ActivityThread & Instrumentation在MultiDex实现中的应用
+              <a href="/2017/12/20/深度学习在CTR预估中的应用之Attention FM/" rel="next" title="深度学习在CTR预估中的应用之Attention FM">
+                <i class="fa fa-chevron-left"></i> 深度学习在CTR预估中的应用之Attention FM
               </a>
             
           </div>
@@ -434,10 +432,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2016/05/04/ubuntu下Boost.Python环境配置/" rel="prev" title="ubuntu下Boost.Python环境配置">
-                ubuntu下Boost.Python环境配置 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -463,8 +457,8 @@
           
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2016/04/30/ML:DL中样本不均衡问题处理方法/"
-           data-title="ML/DL中样本不均衡问题处理方式" data-url="https://xdrush.github.io/2016/04/30/ML:DL中样本不均衡问题处理方法/">
+      <div class="ds-thread" data-thread-key="2018/01/21/读书笔记之《一个广告人的自白》&《广告文案》/"
+           data-title="读书笔记之《一个广告人的自白》&《广告文案》" data-url="https://xdrush.github.io/2018/01/21/读书笔记之《一个广告人的自白》&《广告文案》/">
       </div>
     
   </div>
@@ -564,7 +558,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-背景说明"><span class="nav-number">1.</span> <span class="nav-text">1 背景说明</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-数据不平衡情况下模型的评估"><span class="nav-number">2.</span> <span class="nav-text">2 数据不平衡情况下模型的评估</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-如何处理数据不均衡问题"><span class="nav-number">3.</span> <span class="nav-text">3 如何处理数据不均衡问题</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#《一个广告人的自白》大卫-奥格威"><span class="nav-number">1.</span> <span class="nav-text">《一个广告人的自白》大卫-奥格威</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#《广告文案》乐剑峰"><span class="nav-number">2.</span> <span class="nav-text">《广告文案》乐剑峰</span></a></li></ol></div>
             
 
           </div>
