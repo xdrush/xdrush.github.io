@@ -1,0 +1,961 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="深度学习," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="1 RNN原理1.1 RNN的时序反向传播原理RNN中采用时序反向传播算法（BPTT）对参数更新，下面将简单介绍下BPTT原理，并解释其与传统反向传播的区别。我们还将了解梯度消失问题，这也是推动LSTM和GRU发展的原因。">
+<meta name="keywords" content="深度学习">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RNN原理详解以及tensorflow中的RNN实现">
+<meta property="og:url" content="https://xdrush.github.io/2018/02/12/RNN原理详解以及tensorflow中的RNN实现/index.html">
+<meta property="og:site_name" content="XDRush">
+<meta property="og:description" content="1 RNN原理1.1 RNN的时序反向传播原理RNN中采用时序反向传播算法（BPTT）对参数更新，下面将简单介绍下BPTT原理，并解释其与传统反向传播的区别。我们还将了解梯度消失问题，这也是推动LSTM和GRU发展的原因。">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/%E5%9F%BA%E6%9C%ACRNN%E7%BB%93%E6%9E%84%E5%9B%BE.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/RNN%E5%9F%BA%E6%9C%AC%E6%96%B9%E7%A8%8B.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/RNN%E4%BA%A4%E5%8F%89%E7%86%B5%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/%E5%9F%BA%E6%9C%ACRNN%E8%AF%AF%E5%B7%AE%E7%A4%BA%E6%84%8F%E5%9B%BE.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/RNN%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD%E6%9B%B4%E6%96%B0W.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/E3%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD%E6%B1%82%E5%AF%BC.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/E3%E5%AF%B9W%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD%E6%B1%82%E5%AF%BC.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/E3%E5%AF%B9W%E7%9A%84%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD%E7%A4%BA%E6%84%8F%E5%9B%BE.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/E3%E5%AF%B9W%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD%E6%B1%82%E5%AF%BC.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/W%E5%AF%BC%E6%95%B0%E9%93%BE%E5%BC%8F%E6%B1%82%E5%AF%BC%E6%B3%95%E5%88%99%E9%87%8D%E5%86%99.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/tanh%E5%87%BD%E6%95%B0%E5%8F%8A%E5%85%B6%E5%AF%BC%E6%95%B0%E5%8F%96%E5%80%BC%E8%8C%83%E5%9B%B4.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/sigmoid%E5%8F%8A%E5%85%B6%E5%AF%BC%E6%95%B0.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/LSTM.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/LSTM-%E9%81%97%E5%BF%98%E9%97%A8.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/LSTM-%E8%BE%93%E5%85%A5%E9%97%A8.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/LSTM-%E8%BE%93%E5%85%A5%E9%97%A82.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/LSTM-%E8%BE%93%E5%87%BA%E9%97%A8.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/gru%E7%BB%93%E6%9E%84.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/simple-RNN.png">
+<meta property="og:updated_time" content="2018-03-03T09:44:58.124Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="RNN原理详解以及tensorflow中的RNN实现">
+<meta name="twitter:description" content="1 RNN原理1.1 RNN的时序反向传播原理RNN中采用时序反向传播算法（BPTT）对参数更新，下面将简单介绍下BPTT原理，并解释其与传统反向传播的区别。我们还将了解梯度消失问题，这也是推动LSTM和GRU发展的原因。">
+<meta name="twitter:image" content="http://7xtapc.com2.z0.glb.clouddn.com/%E5%9F%BA%E6%9C%ACRNN%E7%BB%93%E6%9E%84%E5%9B%BE.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xdrush.github.io/2018/02/12/RNN原理详解以及tensorflow中的RNN实现/"/>
+
+
+
+
+
+  <title> RNN原理详解以及tensorflow中的RNN实现 | XDRush </title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">XDRush</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle">Ideas worth spreading and sharing...</p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="https://xdrush.github.io/2018/02/12/RNN原理详解以及tensorflow中的RNN实现/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Dong Xu">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xtapc.com2.z0.glb.clouddn.com/mywebsite_icon.JPG">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="XDRush">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="XDRush" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                RNN原理详解以及tensorflow中的RNN实现
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-02-12T19:19:39+08:00">
+                2018-02-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/02/12/RNN原理详解以及tensorflow中的RNN实现/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/02/12/RNN原理详解以及tensorflow中的RNN实现/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="1-RNN原理"><a href="#1-RNN原理" class="headerlink" title="1 RNN原理"></a>1 RNN原理</h1><h2 id="1-1-RNN的时序反向传播原理"><a href="#1-1-RNN的时序反向传播原理" class="headerlink" title="1.1 RNN的时序反向传播原理"></a>1.1 RNN的时序反向传播原理</h2><p>RNN中采用时序反向传播算法（BPTT）对参数更新，下面将简单介绍下BPTT原理，并解释其与传统反向传播的区别。我们还将了解梯度消失问题，这也是推动LSTM和GRU发展的原因。</p>
+<a id="more"></a>
+<h3 id="1-1-1-时序反向传播算法"><a href="#1-1-1-时序反向传播算法" class="headerlink" title="1.1.1 时序反向传播算法"></a>1.1.1 时序反向传播算法</h3><p>我们以基本RNN结构来说明BPTT算法的原理：<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/%E5%9F%BA%E6%9C%ACRNN%E7%BB%93%E6%9E%84%E5%9B%BE.png" alt="基本的RNN结构图"></p>
+<p>上图为基本的RNN展开结构图，下面公式展示的是RNN的方程式：<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/RNN%E5%9F%BA%E6%9C%AC%E6%96%B9%E7%A8%8B.png" alt="RNN基本方程"></p>
+<p>同样，将损失函数定义为交叉熵损失函数：<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/RNN%E4%BA%A4%E5%8F%89%E7%86%B5%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0.png" alt="RNN交叉熵损失函数"></p>
+<p>这里$y_t$为t时刻正确的label，$\widehat{y}_t$是我们的预测。通常我们会将一个完整的句子序列视为一个训练样本，因此总误差为各时间步上的误差之和。<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/%E5%9F%BA%E6%9C%ACRNN%E8%AF%AF%E5%B7%AE%E7%A4%BA%E6%84%8F%E5%9B%BE.png" alt="基本RNN误差示意图"></p>
+<p>别忘了我们的目的是要计算误差对应的参数U、V和W的梯度，然后借助SGD算法来更新参数。当然，我们统计的不只是误差，还包括训练样本在每时间步的梯度：<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/RNN%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD%E6%9B%B4%E6%96%B0W.png" alt="RNN反向传播更新W"></p>
+<p>这一步比较好理解，因为总误差等于每个时刻的误差之和，上面就梯度公式对$W$、$V$、$U$均适用。</p>
+<p>我们借助导数的链式求导法则来计算梯度，本文后续部分以$E_3$为例来进行介绍：<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/E3%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD%E6%B1%82%E5%AF%BC.png" alt="E3反向传播"></p>
+<p>上式表明，$\dfrac{\partial{E_3}}{\partial{V}}$的值仅取决于当前时间步的值：$y_t$、$\widehat{y}_t$、$s_3$。同样的，其他时间步对$E$的偏导数也能求出，有了这些值，计算参数$V$的梯度就比较简单了。</p>
+<p>接下来再看看$\dfrac{\partial{E_3}}{\partial{W}}$如何求。由上面的公式我们可以推断出$E_3$对$W$的偏导计算公式如下：<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/E3%E5%AF%B9W%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD%E6%B1%82%E5%AF%BC.png" alt="E3对W反向传播求导"><br>上面的计算公式用到了复合函数求导法则，将每个时间步长对梯度的贡献相加。换言之，由于参数$W$时间步长应用于想要的输出，因此需从$t=3$开始通过所有网络路径到$t=0$进行反向传播梯度。<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/E3%E5%AF%B9W%E7%9A%84%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD%E7%A4%BA%E6%84%8F%E5%9B%BE.png" alt="反向传播示意图"></p>
+<p>需要注意的是，这与我们在深度神经网络中应用的标准反向传播算法完全一致，主要区别在于我们对每时间步的参数$W$的梯度进行了求和，传统的人工神经网络中，我们不在层与层之间共享参数，也就无需求和。</p>
+<h3 id="1-1-2-梯度消失问题"><a href="#1-1-2-梯度消失问题" class="headerlink" title="1.1.2 梯度消失问题"></a>1.1.2 梯度消失问题</h3><p>我们知道在传统RNN中，是无法解决长期以来问题的。而文本信息的句意通常取决于相隔较远的单词，例如“The man who wore a wig on his head went inside”的语意重心在于一个人走进屋里，而非男人戴着假发。但标准的RNN难以捕获此类信息。那么不妨通过分析上面计算出的梯度来一探究竟：</p>
+<p><img src="http://7xtapc.com2.z0.glb.clouddn.com/E3%E5%AF%B9W%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD%E6%B1%82%E5%AF%BC.png" alt="E3对W反向传播求导"><br>上式中，别忘了一点：$\dfrac{\partial{s_3}}{\partial{s_k}}$本身为链式法则，$$\dfrac{\partial{s_3}}{\partial{s_1}}=\dfrac{\partial{s_3}}{\partial{s_2}}*\dfrac{\partial{s_2}}{\partial{s_1}}$$</p>
+<p>还需要注意，在对向量函数的向量求导，结果是一个矩阵，逐元素求导，因此，上述梯度可重写为：<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/W%E5%AF%BC%E6%95%B0%E9%93%BE%E5%BC%8F%E6%B1%82%E5%AF%BC%E6%B3%95%E5%88%99%E9%87%8D%E5%86%99.png" alt="链式求导法则重写"></p>
+<p>tanh、sigmoid函数及其导数的值域如下图所示（参考<a href="http://nn.readthedocs.io/en/rtd/transfer/）：" target="_blank" rel="external">http://nn.readthedocs.io/en/rtd/transfer/）：</a></p>
+<p><strong>tanh函数及其导数</strong><br><img src="http://7xtapc.com2.z0.glb.clouddn.com/tanh%E5%87%BD%E6%95%B0%E5%8F%8A%E5%85%B6%E5%AF%BC%E6%95%B0%E5%8F%96%E5%80%BC%E8%8C%83%E5%9B%B4.png" alt="tanh函数及其导数取值范围"></p>
+<p><strong>sigmoid函数及其导数</strong><br><img src="http://7xtapc.com2.z0.glb.clouddn.com/sigmoid%E5%8F%8A%E5%85%B6%E5%AF%BC%E6%95%B0.png" alt="sigmoid函数及其导数"></p>
+<p>可以看到tanh和sigmoid函数在两端的导数均为0，近乎呈直线状（导数为0，函数图像为直线），此种情况下可称相应的神经元已经饱和。两函数的梯度为0，使前层的其它梯度也趋近于0。由于矩阵元素数值较小，且矩阵相乘数次（t - k次）后，梯度值迅速以指数形式收缩（意思相近于，小数相乘，数值收缩，越来越小），最终在几个时间步长后完全消失。“较远”的时间步长贡献的梯度变为0，这些时间段的状态不会对你的学习有所贡献：你最终还是无法学习长期依赖。梯度消失不仅存在于循环神经网络，也出现在深度前馈神经网络中。区别在于，循环神经网络非常深（本例中，深度与句长相同），因此梯度消失问题更为常见。</p>
+<p>不难想象，如果雅克比矩阵的值非常大，参照激活函数及网络参数可能会出现梯度爆炸，即所谓的梯度爆炸问题。相较于梯度爆炸，梯度消失问题更受关注，主要有两个原因：其一，梯度爆炸现象明显，梯度会变成Nan（而并非数字），并出现程序崩溃；其二，在预定义阈值处将梯度截断是一种解决梯度爆炸问题简单有效的方法。<strong>而梯度消失问题更为复杂，因为其现象不明显，且解决方案尚不明确。</strong></p>
+<p>幸运的是，目前有一些方法可解决梯度消失问题。合理初始化矩阵 W可缓解梯度消失现象。还可采用正则化方法。此外，更好的方法是使用 ReLU，而非tanh或sigmoid激活函数。ReLU函数的导数是个常量，0或1，因此不太可能出现梯度消失现象。</p>
+<p>更常用的方法是借助LSTM或GRU架构。1997年，首次提出LSTM ，目前该模型在NLP领域的应用极其广泛。GRU则于2014年问世，是LSTM的简化版。这些循环神经网络旨在解决梯度消失和有效学习长期依赖问题。</p>
+<h2 id="1-2-RNN变体之LSTM"><a href="#1-2-RNN变体之LSTM" class="headerlink" title="1.2 RNN变体之LSTM"></a>1.2 RNN变体之LSTM</h2><p>LSTM的整体结构如下所示；<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/LSTM.png" alt="LSTM整体结构"></p>
+<p>接下来我们来逐步拆解下LSTM，看看里面每一个门的原理：</p>
+<h3 id="1-2-1-遗忘门"><a href="#1-2-1-遗忘门" class="headerlink" title="1.2.1 遗忘门"></a>1.2.1 遗忘门</h3><p>在LSTM中的第一步是决定从cell状态中丢弃什么信息。这个决定是通过一个称为<strong>“遗忘门”</strong>的结构来完成。这个“门”会读取$h_{t-1}$和$x<em>t$，输出一个0到1之间的数值给每个在cell状态$C</em>{t-1}$中的值，1表示“完全保留”，0表示“完全丢弃”。<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/LSTM-%E9%81%97%E5%BF%98%E9%97%A8.png" alt="LSTM遗忘门"></p>
+<h3 id="1-2-2-输入门"><a href="#1-2-2-输入门" class="headerlink" title="1.2.2 输入门"></a>1.2.2 输入门</h3><p>下一步是决定让多少新的信息加入到cell状态中来。实现这个需要包括两个步骤：首先，一个叫做“input gate layer”的sigmoid层决定哪些信息需要更新；一个$tanh$层生成一个向量，也就是备选的用来更新的内容，$C_t$。在下一步，我们把这两部分联合起来，对 cell 的状态进行一个更新。<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/LSTM-%E8%BE%93%E5%85%A5%E9%97%A8.png" alt="LSTM输入门"></p>
+<p>有了上述的结构，我们就可以按照下图来更新 cell 状态了， 即把$C_{t-1}$更新为 $C_t$，这部分信息就是我们要添加的新内容。<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/LSTM-%E8%BE%93%E5%85%A5%E9%97%A82.png" alt="LSTM更新cell状态值"></p>
+<h3 id="1-2-3-输出门"><a href="#1-2-3-输出门" class="headerlink" title="1.2.3 输出门"></a>1.2.3 输出门</h3><p>最后，我们需要来决定输出什么值了。这个输出主要是依赖于 cell 的状态$C_t$，但是又不仅仅依赖于$C_t$，而是需要经过一个过滤的处理。</p>
+<blockquote>
+<ul>
+<li>首先，我们还是使用一个sigmoid层来（计算出）决定$C_t$中的哪部分信息会被输出；</li>
+<li>接着，我们把$C_t$通过一个 tanh 层（把数值都归到 -1 和 1 之间），然后把 tanh 层的输出和 sigmoid 层计算出来的权重相乘，这样就得到了最后输出的结果。</li>
+</ul>
+</blockquote>
+<p>在语言模型例子中，假设我们的模型刚刚接触了一个代词，接下来可能要输出一个动词，这个输出可能就和代词的信息相关了。比如说，这个动词应该采用单数形式还是复数的形式，那么我们就得把刚学到的和代词相关的信息都加入到 cell 状态中来，才能够进行正确的预测。<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/LSTM-%E8%BE%93%E5%87%BA%E9%97%A8.png" alt="LSTM输出门"></p>
+<h2 id="1-3-RNN变体之GRU"><a href="#1-3-RNN变体之GRU" class="headerlink" title="1.3 RNN变体之GRU"></a>1.3 RNN变体之GRU</h2><p>GRU（Gated Recurrent Unit ），这是由 Cho, et al. (2014) 提出。在 GRU 中，如下图所示，只有两个门：重置门（reset gate）和更新门（update gate）。同时在这个结构中，把细胞状态和隐藏状态进行了合并。最后模型比标准的 LSTM 结构要简单，而且这个结构后来也非常流行。<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/gru%E7%BB%93%E6%9E%84.png" alt="GRU结构"></p>
+<h1 id="2-Tensorflow中的RNN实现"><a href="#2-Tensorflow中的RNN实现" class="headerlink" title="2 Tensorflow中的RNN实现"></a>2 Tensorflow中的RNN实现</h1><h2 id="2-1-tensorflow中的RNN"><a href="#2-1-tensorflow中的RNN" class="headerlink" title="2.1 tensorflow中的RNN"></a>2.1 tensorflow中的RNN</h2><p>tensorflow提供了基本的RNN接口：tf.nn.rnn_cell.RNNCell()，我们首先来简单的看下这个接口：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">RNNCell</span><span class="params">(base_layer.Layer)</span>:</span></div><div class="line">  <span class="string">"""Abstract object representing an RNN cell.</span></div><div class="line">  </div><div class="line">  Every `RNNCell` must have the properties below and implement `call` with the signature `(output, next_state) = call(input, state)`.  The optional third input argument, `scope`, is allowed for backwards compatibility purposes; but should be left off for new subclasses.</div><div class="line"></div><div class="line">  This definition of cell differs from the definition used in the literature. In the literature, 'cell' refers to an object with a single scalar output. This definition refers to a horizontal array of such units.</div><div class="line"></div><div class="line">  An RNN cell, in the most abstract setting, is anything that has a state and performs some operation that takes a matrix of inputs. This operation results in an output matrix with `self.output_size` columns. If `self.state_size` is an integer, this operation also results in a new state matrix with `self.state_size` columns.  If `self.state_size` is a (possibly nested tuple of) TensorShape object(s), then it should return a matching structure of Tensors having shape `[batch_size].concatenate(s)` for each `s` in `self.batch_size`.</div><div class="line">  """</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(self, inputs, state, scope=None)</span>:</span></div><div class="line">    <span class="string">"""Run this RNN cell on inputs, starting from the given state.</span></div><div class="line"></div><div class="line">    Args:</div><div class="line">      inputs: `2-D` tensor with shape `[batch_size x input_size]`.</div><div class="line">      state: if `self.state_size` is an integer, this should be a `2-D Tensor` with shape `[batch_size x self.state_size]`.  Otherwise, if `self.state_size` is a tuple of integers, this should be a tuple with shapes `[batch_size x s] for s in self.state_size`.</div><div class="line">      scope: VariableScope for the created subgraph; defaults to class name.</div><div class="line"></div><div class="line">    Returns:</div><div class="line">      A pair containing:</div><div class="line"></div><div class="line">      - Output: A `2-D` tensor with shape `[batch_size x self.output_size]`.</div><div class="line">      - New state: Either a single `2-D` tensor, or a tuple of tensors matching the arity and shapes of `state`.</div><div class="line">    """</div><div class="line">    <span class="keyword">if</span> scope <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</div><div class="line">      <span class="keyword">with</span> vs.variable_scope(scope,</div><div class="line">                             custom_getter=self._rnn_get_variable) <span class="keyword">as</span> scope:</div><div class="line">        <span class="keyword">return</span> super(RNNCell, self).__call__(inputs, state, scope=scope)</div><div class="line">    <span class="keyword">else</span>:</div><div class="line">      <span class="keyword">with</span> vs.variable_scope(vs.get_variable_scope(),</div><div class="line">                             custom_getter=self._rnn_get_variable):</div><div class="line">        <span class="keyword">return</span> super(RNNCell, self).__call__(inputs, state)</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">def</span> <span class="title">_rnn_get_variable</span><span class="params">(self, getter, *args, **kwargs)</span>:</span></div><div class="line">    variable = getter(*args, **kwargs)</div><div class="line">    trainable = (variable <span class="keyword">in</span> tf_variables.trainable_variables() <span class="keyword">or</span></div><div class="line">                 (isinstance(variable, tf_variables.PartitionedVariable) <span class="keyword">and</span></div><div class="line">                  list(variable)[<span class="number">0</span>] <span class="keyword">in</span> tf_variables.trainable_variables()))</div><div class="line">    <span class="keyword">if</span> trainable <span class="keyword">and</span> variable <span class="keyword">not</span> <span class="keyword">in</span> self._trainable_weights:</div><div class="line">      self._trainable_weights.append(variable)</div><div class="line">    <span class="keyword">elif</span> <span class="keyword">not</span> trainable <span class="keyword">and</span> variable <span class="keyword">not</span> <span class="keyword">in</span> self._non_trainable_weights:</div><div class="line">      self._non_trainable_weights.append(variable)</div><div class="line">    <span class="keyword">return</span> variable</div><div class="line"></div><div class="line"><span class="meta">  @property</span></div><div class="line">  <span class="function"><span class="keyword">def</span> <span class="title">state_size</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="string">"""size(s) of state(s) used by this cell.</span></div><div class="line"></div><div class="line">    It can be represented by an Integer, a TensorShape or a tuple of Integers or TensorShapes.</div><div class="line">    """</div><div class="line">    <span class="keyword">raise</span> NotImplementedError(<span class="string">"Abstract method"</span>)</div><div class="line"></div><div class="line"><span class="meta">  @property</span></div><div class="line">  <span class="function"><span class="keyword">def</span> <span class="title">output_size</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="string">"""Integer or TensorShape: size of outputs produced by this cell."""</span></div><div class="line">    <span class="keyword">raise</span> NotImplementedError(<span class="string">"Abstract method"</span>)</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">def</span> <span class="title">build</span><span class="params">(self, _)</span>:</span></div><div class="line">    <span class="comment"># This tells the parent Layer object that it's OK to call</span></div><div class="line">    <span class="comment"># self.add_variable() inside the call() method.</span></div><div class="line">    <span class="keyword">pass</span></div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">def</span> <span class="title">zero_state</span><span class="params">(self, batch_size, dtype)</span>:</span></div><div class="line">    <span class="string">"""Return zero-filled state tensor(s).</span></div><div class="line"></div><div class="line">    Args:</div><div class="line">      batch_size: int, float, or unit Tensor representing the batch size.</div><div class="line">      dtype: the data type to use for the state.</div><div class="line"></div><div class="line">    Returns:</div><div class="line">      If `state_size` is an int or TensorShape, then the return value is a `N-D` tensor of shape `[batch_size x state_size]` filled with zeros.</div><div class="line"></div><div class="line">      If `state_size` is a nested list or tuple, then the return value is a nested list or tuple (of the same structure) of `2-D` tensors with the shapes `[batch_size x s]` for each s in `state_size`.</div><div class="line">    """</div><div class="line">    <span class="keyword">with</span> ops.name_scope(type(self).__name__ + <span class="string">"ZeroState"</span>, values=[batch_size]):</div><div class="line">      state_size = self.state_size</div><div class="line">      <span class="keyword">return</span> _zero_state_tensors(state_size, batch_size, dtype)</div></pre></td></tr></table></figure></p>
+<p>从上面的代码我们得知，RNNCell()其实是不能直接调用的，需要对其中的几个方法做implemention，直接调用RNNCell()会报错：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">input = tf.random_uniform(shape=[<span class="number">3</span>, <span class="number">4</span>, <span class="number">6</span>], dtype=tf.float32)</div><div class="line">cell = tf.nn.rnn_cell.RNNCell(<span class="number">10</span>)</div><div class="line"></div><div class="line">init_state = cell.zero_state(<span class="number">4</span>, dtype=tf.float32)</div><div class="line">output, final_state = tf.nn.dynamic_rnn(cell, inputs=input, initial_state=init_state, time_major=<span class="keyword">True</span>)</div><div class="line"></div><div class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</div><div class="line">    sess.run(tf.global_variables_initializer())</div><div class="line">    <span class="keyword">print</span> (sess.run(output))</div><div class="line">    <span class="keyword">print</span> (sess.run(final_state))</div></pre></td></tr></table></figure></p>
+<p>运行上面代码会报错，具体错误为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">raise NotImplementedError(&quot;Abstract method&quot;)</div><div class="line">NotImplementedError: Abstract method</div></pre></td></tr></table></figure></p>
+<p>这个Error正是上面RNNCell类中方法抛出来的Error。</p>
+<p><strong>可以认为，RNNCell是所有其他RNN的基类，</strong>这个从源码中能够很直接的看到：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">## BasicRNNCell</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">BasicRNNCell</span><span class="params">(RNNCell)</span>:</span></div><div class="line"></div><div class="line"><span class="comment">## BasicLSTMCell</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">BasicLSTMCell</span><span class="params">(RNNCell)</span>:</span></div><div class="line"></div><div class="line"><span class="comment">## GRUCell</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">GRUCell</span><span class="params">(RNNCell)</span>:</span></div><div class="line"></div><div class="line"><span class="comment">## 等等其他的RNN变体</span></div></pre></td></tr></table></figure></p>
+<p>因此，我们将上面代码中的RNNCell换成BasicRNNCell/BasicLSTMCell/GRUCell都可以正确运行。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">BATCH_SIZE = <span class="number">4</span></div><div class="line"></div><div class="line"><span class="comment">## 因为后面time_major=True，因此这里shape=[3, 4, 6]，3表示max_time，也就是文本的长度，6表示文本词向量大小</span></div><div class="line">input = tf.random_uniform(shape=[<span class="number">3</span>, BATCH_SIZE, <span class="number">6</span>], dtype=tf.float32)</div><div class="line"></div><div class="line">cell = tf.nn.rnn_cell.BasicRNNCell(<span class="number">10</span>)</div><div class="line"><span class="comment">## 或者用LSTMCell</span></div><div class="line"><span class="comment"># cell = tf.nn.rnn_cell.LSTMCell(10)</span></div><div class="line"><span class="comment">## 或者用GRUCell</span></div><div class="line"><span class="comment"># cell = tf.nn.rnn_cell.GRUCell(10)</span></div><div class="line"></div><div class="line">init_state = cell.zero_state(BATCH_SIZE, dtype=tf.float32)</div><div class="line">output, final_state = tf.nn.dynamic_rnn(cell, inputs=input, initial_state=init_state, time_major=<span class="keyword">True</span>)</div><div class="line"></div><div class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</div><div class="line">    sess.run(tf.global_variables_initializer())</div><div class="line">    <span class="keyword">print</span> (sess.run(output))</div><div class="line">    <span class="keyword">print</span> (sess.run(final_state))</div></pre></td></tr></table></figure></p>
+<p>上面例子中，在定义cell是，无论是BasicRNNCell、BasicLSTMCell、GRUCell都有一个参数num_units，理解这几个Cell的参数含义十分重要：<br><strong>BasicLSTMCell</strong><br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, num_units, forget_bias=<span class="number">1.0</span>, state_is_tuple=True, activation=None, reuse=None)</span>:</span></div></pre></td></tr></table></figure></p>
+<p>几个参数的含义如下：</p>
+<blockquote>
+<ul>
+<li>num_uints：官方API里给出的解释是“The number of units in the LSTM cell”，也就是上面LSTM结构图中$h_t$和$C_t$的维度（$h_t$和$C_t$具有相同的维度）。指定这个参数之后，RNN内部会对$W$、$b$作自动维度适配；</li>
+<li>forget_bias：没太弄明白这个参数是干嘛的；</li>
+<li>state_is_tuple：决定输出是否是tuple，默认为True，为False根据官方文档会被废弃掉；</li>
+<li>activation：指定激活函数，当activation为None时，默认使用的就是tanh；</li>
+</ul>
+</blockquote>
+<p>BasicRNNCell、GRUCell等参数同BasicLSTMCell，这里不做多述。</p>
+<h2 id="2-2-关于output和state"><a href="#2-2-关于output和state" class="headerlink" title="2.2 关于output和state"></a>2.2 关于output和state</h2><p>个人认为，RNN最难理解的地方之一就是output和state，output对应的是输出，state对应的是状态，在tensorflow中，dynamic_rnn、static_rnn、bidirectional_dynamic_rnn、static_bidirectional_rnn都是返回(outputs, last_states)元组，<strong>注意，last_states是最终的状态，而outputs对应的则是每个时刻的输出。</strong>在使用tensorflow做RNN相关任务时，这一点不理解清楚后面就没法儿继续了。</p>
+<p>output和state在RNN及其变体中的意义是不一样的，所表示的值也不一样，下面来看下几个最基本的RNN及其变体中的output和state的含义：</p>
+<p><strong>BasicRNNCell</strong><br>基本的RNN结构如下所示：<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/simple-RNN.png" alt="基本的RNN"><br>在基本的RNN结构中，我们可以认为输出就等于隐层状态值。我们来看下以下代码的outputs和last_states的值：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">dynamic_rnn_test</span><span class="params">()</span>:</span></div><div class="line">    BATCH_SIZE = <span class="number">2</span></div><div class="line">    EMBEDDING_DIM = <span class="number">4</span></div><div class="line">    X = np.random.randn(BATCH_SIZE, <span class="number">5</span>, EMBEDDING_DIM)</div><div class="line">    X_lengths = [<span class="number">5</span>, <span class="number">5</span>]</div><div class="line"></div><div class="line">    cell = tf.nn.rnn_cell.BasicRNNCell(num_units=<span class="number">10</span>)</div><div class="line">    outputs, last_states = tf.nn.dynamic_rnn(cell=cell, dtype=tf.float64, sequence_length=X_lengths, inputs=X)</div><div class="line">    result = tf.contrib.learn.run_n(&#123;<span class="string">"outputs"</span>: outputs, <span class="string">"last_states"</span>: last_states&#125;, n=<span class="number">1</span>, feed_dict=<span class="keyword">None</span>)</div><div class="line"></div><div class="line">    <span class="keyword">print</span> (result[<span class="number">0</span>][<span class="string">"outputs"</span>])</div><div class="line">    <span class="keyword">print</span> (<span class="string">"--------------------------------"</span>)</div><div class="line">    <span class="keyword">print</span> (result[<span class="number">0</span>][<span class="string">"last_states"</span>])</div></pre></td></tr></table></figure></p>
+<p>上面代码的输出结果为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">## outputs结果</div><div class="line">[[[-0.26285439 -0.73199998  0.67373167 -0.42019807 -0.76447828 -0.15671307  0.19419611 -0.06485997 -0.59310542  0.41760793]</div><div class="line">  [-0.51952513  0.61765864  0.54485767  0.35961272  0.09553398  0.68890209   -0.46678386  0.34405317  0.8904701  -0.04432281]</div><div class="line">  [ 0.96647506 -0.50980204  0.55754585  0.93328233  0.57254379  0.6663917  -0.40768854  0.86358991 -0.58068622 -0.72018298]</div><div class="line">  [ 0.3345003  -0.09220678  0.69535521 -0.01648253 -0.21293752 -0.12114425  0.14904557  0.59020341  0.3342177   0.25945014]</div><div class="line">  [ 0.05128395  0.86625483  0.28549682  0.76454802  0.44757274  0.691485  0.00960586  0.23504622  0.75175537 -0.33478982]]</div><div class="line"></div><div class="line"> [[-0.27505881  0.78801392 -0.92769186  0.38675853  0.31331528 -0.79453833  0.77526593 -0.34045865  0.52494778  0.08722081]</div><div class="line">  [ 0.21659185 -0.05254756 -0.46941906 -0.70990551  0.82241305  0.7653751  -0.75469825 -0.65669409 -0.68308972 -0.54132448]</div><div class="line">  [ 0.6928769  -0.80066683  0.02133818 -0.66396161 -0.48229484 -0.80333658  0.66119584  0.79458079 -0.73295564 -0.65123496]</div><div class="line">  [-0.84663     0.26150571 -0.35573722 -0.88728337 -0.70946976 -0.59880986  0.95380342  0.63640031  0.14041671 -0.74008235]</div><div class="line">  [-0.49611388 -0.6615701  -0.91717102 -0.7921021   0.19823286 -0.52368639  0.73433595 -0.42381531 -0.22037713 -0.6572696 ]]]</div><div class="line">--------------------------------</div><div class="line">## last_states结果</div><div class="line">[[ 0.05128395  0.86625483  0.28549682  0.76454802  0.44757274  0.691485  0.00960586  0.23504622  0.75175537 -0.33478982]</div><div class="line"> [-0.49611388 -0.6615701  -0.91717102 -0.7921021   0.19823286 -0.52368639  0.73433595 -0.42381531 -0.22037713 -0.6572696 ]]</div></pre></td></tr></table></figure></p>
+<p>比较下outputs[0][4]（第一个样本最后时刻的输出）和last_states[0]（第一个样本最后的状态）、以及outputs[1][4]（第二个样本最后时刻的输出）和last_states[1]（第二个样本最后时刻的输出）的值，<strong>不难发现，它们是相等的！</strong>这也印证上面的说法。</p>
+<p><strong>BasicLSTMCell</strong><br>LSTM与基本的RNN有些不用（参见1.3节），因为LSTM引入了4个门，多了几个状态，因此LSTM的输出和BasicRNNCell是不同的。我们通过一个例子看看BasicLSTMCell的基本用法：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">BATCH_SIZE = <span class="number">2</span></div><div class="line">    EMBEDDING_DIM = <span class="number">4</span></div><div class="line">    X = np.random.randn(BATCH_SIZE, <span class="number">5</span>, EMBEDDING_DIM)</div><div class="line">    X_lengths = [<span class="number">5</span>, <span class="number">5</span>]</div><div class="line"></div><div class="line">    <span class="comment">## 使用LSTM</span></div><div class="line">    cell = tf.nn.rnn_cell.BasicLSTMCell(num_units=<span class="number">10</span>)</div><div class="line">    outputs, last_states = tf.nn.dynamic_rnn(cell=cell, dtype=tf.float64, sequence_length=X_lengths, inputs=X)</div><div class="line">    result = tf.contrib.learn.run_n(&#123;<span class="string">"outputs"</span>: outputs, <span class="string">"last_states"</span>: last_states&#125;, n=<span class="number">1</span>, feed_dict=<span class="keyword">None</span>)</div><div class="line"></div><div class="line">    <span class="keyword">print</span> (result[<span class="number">0</span>][<span class="string">"outputs"</span>])</div><div class="line">    <span class="keyword">print</span> (<span class="string">"--------------------------------"</span>)</div><div class="line">    <span class="keyword">print</span> (result[<span class="number">0</span>][<span class="string">"last_states"</span>])</div></pre></td></tr></table></figure></p>
+<p>以上运行的结果为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">[[[-0.02559858  0.06167649  0.1645186   0.05837131  0.01109476 -0.02938359  0.11438462 -0.0655154   0.05643917 -0.17126968]</div><div class="line">  [ 0.03442813  0.01858283  0.19324815 -0.08899226  0.03568535 -0.04120232  0.1620414  -0.12981834  0.13737953 -0.10649411]</div><div class="line">  [ 0.021796   -0.0292876   0.04972559 -0.04365079  0.06611464 -0.0123974  0.04471634 -0.09371935  0.07161399 -0.00129043]</div><div class="line">  [-0.06856613  0.08481594  0.08859627 -0.07172004 -0.02254162  0.04920269  0.06426967 -0.07178349  0.06880909 -0.03122769]</div><div class="line">  [-0.05681122  0.1265717   0.08145183 -0.10992898 -0.04531312  0.08419307  0.05815578 -0.03600487  0.06829341 -0.00815202]]</div><div class="line"></div><div class="line"> [[-0.03048013 -0.05028687  0.04530328 -0.01116215 -0.00322128 -0.0376331  0.05989264 -0.1386925  -0.02739475 -0.0416665 ]</div><div class="line">  [-0.07246373  0.00922893 -0.02089626  0.12696067  0.05484725 -0.05276134  0.02418303 -0.0003094  -0.04619291 -0.02940275]</div><div class="line">  [-0.06912543  0.06466857  0.22031627 -0.07334317 -0.03599558  0.01374829  0.12909539 -0.1685715   0.05465224 -0.19901284]</div><div class="line">  [-0.0769867   0.05043309  0.08731908  0.00185187  0.00557504  0.007338  0.0641817  -0.0849491   0.0245508  -0.07668919]</div><div class="line">  [-0.01582939  0.00979516 -0.02073626  0.09953952  0.10595823 -0.0135512  -0.12155518  0.04029387  0.00712342  0.02277357]]]</div><div class="line">--------------------------------</div><div class="line">LSTMStateTuple(</div><div class="line">c=array([[-0.13211159,  0.26529373,  0.18125151, -0.19673843, -0.10883727,  0.16908338,  0.10463188, -0.08444297,  0.17317917, -0.01578971],  [-0.03322975,  0.02126845, -0.04260041,  0.19423348,  0.22194511,  -0.03170695, -0.19370151,  0.10526997,  0.0245572 ,  0.05014028]]), </div><div class="line">h=array([[-0.05681122,  0.1265717 ,  0.08145183, -0.10992898, -0.04531312,  0.08419307,  0.05815578, -0.03600487,  0.06829341, -0.00815202],  [-0.01582939,  0.00979516, -0.02073626,  0.09953952,  0.10595823,  -0.0135512 , -0.12155518,  0.04029387,  0.00712342,  0.02277357]]))</div></pre></td></tr></table></figure></p>
+<p>从上面结果中我们看到，和BasicRNNCell相同的是，BasicLSTMCell返回的outputs是一样的，都是对应于每个时刻的输出（其实这里的输出也就是每个时刻的隐层状态值；更为一般的做法是，得到outputs值之后，在经过一个全连接层、softmax层做分类任务）。不同的是，last_states的值，BasicLSTMCell的last_states返回的是一个LSTMStateTuple，也就是一个LSTMState结构的元组，元组里面包含两个元素：c和h，c表示的就是最后时刻cell的内部状态值，h表示的就是最后时刻隐层状态值。</p>
+<p><strong>GRUCell</strong><br>从1.4节中GRU原理可知，GRU的输出outputs和LSTM、BasicRNNCell是一样的，last_states和BasicRNNCell一样，只输出最后一个时刻的隐层状态值。同样用个例子来说明：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">BATCH_SIZE = <span class="number">2</span></div><div class="line">    EMBEDDING_DIM = <span class="number">4</span></div><div class="line">    X = np.random.randn(BATCH_SIZE, <span class="number">5</span>, EMBEDDING_DIM)</div><div class="line">    X_lengths = [<span class="number">5</span>, <span class="number">5</span>]</div><div class="line"></div><div class="line">    <span class="comment">## cell用GRU</span></div><div class="line">    cell = tf.nn.rnn_cell.GRUCell(num_units=<span class="number">10</span>)</div><div class="line">    outputs, last_states = tf.nn.dynamic_rnn(cell=cell, dtype=tf.float64, sequence_length=X_lengths, inputs=X)</div><div class="line">    result = tf.contrib.learn.run_n(&#123;<span class="string">"outputs"</span>: outputs, <span class="string">"last_states"</span>: last_states&#125;, n=<span class="number">1</span>, feed_dict=<span class="keyword">None</span>)</div><div class="line"></div><div class="line">    <span class="keyword">print</span> (result[<span class="number">0</span>][<span class="string">"outputs"</span>])</div><div class="line">    <span class="keyword">print</span> (<span class="string">"--------------------------------"</span>)</div><div class="line">    <span class="keyword">print</span> (result[<span class="number">0</span>][<span class="string">"last_states"</span>])</div></pre></td></tr></table></figure></p>
+<p>输出结果为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">[[[ 0.2818741   0.03127117 -0.10587379  0.04028049  0.10053002  0.15848186  -0.18849411  0.27622443  0.38123248 -0.13761087]</div><div class="line">  [ 0.20203697  0.27380701  0.20594786  0.32964536 -0.03476539  0.0324929  -0.17276558  0.23946512  0.25474486 -0.03569277]</div><div class="line">  [ 0.09995877  0.03133022  0.03788231  0.33481101  0.05394468  0.17044128  -0.22957891  0.07784969  0.12172921 -0.11151596]</div><div class="line">  [-0.01079724  0.34425545  0.36282874  0.51701521 -0.13545613  0.20845521  -0.16279659  0.08200397 -0.07883915 -0.0671937 ]</div><div class="line">  [ 0.04381321  0.10883886  0.37020907  0.42074759  0.14924879  0.07081199  -0.20527748 -0.0342331  -0.01571459  0.01904762]]</div><div class="line"></div><div class="line"> [[ 0.08714771  0.49216403  0.23638074  0.54007724 -0.12808233  0.05203507  0.04589614  0.20300933  0.00669649 -0.08931576]</div><div class="line">  [ 0.15230049  0.31014089  0.25244098  0.44602376 -0.04282711  0.13599053  -0.01098503  0.14189271  0.04150135 -0.06910757]</div><div class="line">  [ 0.3996701   0.10472691  0.21537184  0.39543418  0.22428281  0.07584328  -0.20120173  0.10623939  0.26915325 -0.09094824]</div><div class="line">  [ 0.38323232  0.09812629  0.04226342  0.37831236  0.27365562  0.20740802  -0.24894298  0.1094313   0.2308372  -0.12473171]</div><div class="line">  [ 0.27563199  0.01112365  0.06366856  0.41799209  0.45473254  0.27676832  -0.34215252  0.0085023   0.23020847 -0.23767658]]]</div><div class="line">--------------------------------</div><div class="line">[[ 0.04381321  0.10883886  0.37020907  0.42074759  0.14924879  0.07081199  -0.20527748 -0.0342331  -0.01571459  0.01904762]</div><div class="line"> [ 0.27563199  0.01112365  0.06366856  0.41799209  0.45473254  0.27676832  -0.34215252  0.0085023   0.23020847 -0.23767658]]</div></pre></td></tr></table></figure></p>
+<h2 id="2-2-dynamic-rnn和static-rnn"><a href="#2-2-dynamic-rnn和static-rnn" class="headerlink" title="2.2 dynamic_rnn和static_rnn"></a>2.2 dynamic_rnn和static_rnn</h2><p>上面代码中，我们用到了一个新的api-dynamic_rnn，具体dynamic_rnn如何用？我们不妨先来看下dynamic_rnn的参数：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">dynamic_rnn</span><span class="params">(cell, inputs, sequence_length=None, initial_state=None, dtype=None, parallel_iterations=None, swap_memory=False, time_major=False, scope=None)</span>:</span></div></pre></td></tr></table></figure></p>
+<p>我们来结合一个例子来说明这些参数的含义：</p>
+<p>假设RNN的输入为[2, 5, 4]，其中2位batch_size，5为文本最大长度，4为embedding_size，可以看出，有两个样本，我们假设第二个文本的长度只有3（很容易理解，两个句子的长度不一样，第一个句子长度为5，第二个句子长度为3），那么传统上我们需要对第二个句子做zero-padding。</p>
+<p>假设cell的HIDDEN_SIZE=10，dynamic_rnn返回两个参数：outputs, last_states，其中outputs的shape为[batch_size, max_length, HIDDEN_SIZE]，也就是最终的输出结果；last_states是最终的状态，是由(c, h)组成的元组，大小均为[batch_size, HIDDEN_SIZE]。</p>
+<p>再来看下一个很重要的参数：sequence_length，这个参数用来指定每个文本的长度，比如上面例子中，我们令sequence_length = [5, 3]，表示第一个句子的长度为5，第二个句子的长度为3；当我们传入这个参数时，对于第二个样本，tensorflow对3以后的padding就不做计算了，其last_states将重复第3步的last_states结果直到最后一步，而outputs中超过3步的结果将会被置零。</p>
+<p>完整的例子如下：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">BATCH_SIZE = <span class="number">2</span></div><div class="line">    EMBEDDING_DIM = <span class="number">4</span></div><div class="line">    X = np.random.randn(BATCH_SIZE, <span class="number">5</span>, EMBEDDING_DIM)</div><div class="line">    X[<span class="number">1</span>, <span class="number">3</span>:] = <span class="number">0</span></div><div class="line">    X_lengths = [<span class="number">5</span>, <span class="number">3</span>]</div><div class="line">    <span class="keyword">print</span> (X)</div><div class="line"></div><div class="line">    cell = tf.nn.rnn_cell.BasicLSTMCell(num_units=<span class="number">10</span>)</div><div class="line">    outputs, last_states = tf.nn.dynamic_rnn(cell=cell, dtype=tf.float64, sequence_length=X_lengths, inputs=X)</div><div class="line">    result = tf.contrib.learn.run_n(&#123;<span class="string">"outputs"</span>: outputs, <span class="string">"last_states"</span>: last_states&#125;, n=<span class="number">1</span>, feed_dict=<span class="keyword">None</span>)</div><div class="line"></div><div class="line">    <span class="keyword">print</span> (result[<span class="number">0</span>][<span class="string">"outputs"</span>][<span class="number">0</span>])</div><div class="line">    <span class="keyword">print</span> (<span class="string">"--------------------------------"</span>)</div><div class="line">    <span class="keyword">print</span> (result[<span class="number">0</span>][<span class="string">"last_states"</span>])</div></pre></td></tr></table></figure></p>
+<p>以上运行结果为：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="comment">## 以下是outputs输出结果，可以看出X[1]的最后两维均为0.</span></div><div class="line">[[[ <span class="number">0.05207716</span>  <span class="number">0.02861694</span>  <span class="number">0.02288652</span>  <span class="number">0.0409087</span>   <span class="number">0.02277852</span>  <span class="number">0.08781847</span>  <span class="number">-0.00247622</span>  <span class="number">0.06011031</span>  <span class="number">0.13020951</span>  <span class="number">0.000251</span>  ]</div><div class="line">  [<span class="number">-0.07430806</span>  <span class="number">0.01455017</span>  <span class="number">0.09025484</span>  <span class="number">0.15882481</span> <span class="number">-0.09267721</span>  <span class="number">0.06793234</span>  <span class="number">-0.1265452</span>   <span class="number">0.01313293</span>  <span class="number">0.0492417</span>   <span class="number">0.07891826</span>]</div><div class="line">  [ <span class="number">0.07847199</span>  <span class="number">0.08677312</span> <span class="number">-0.00230764</span>  <span class="number">0.05670163</span> <span class="number">-0.0037383</span>   <span class="number">0.06010096</span>  <span class="number">-0.08496443</span>  <span class="number">0.05015436</span>  <span class="number">0.05824103</span>  <span class="number">0.07590659</span>]</div><div class="line">  [<span class="number">-0.07346585</span> <span class="number">-0.02648895</span>  <span class="number">0.03345542</span>  <span class="number">0.09968405</span> <span class="number">-0.18647533</span> <span class="number">-0.07887278</span>  <span class="number">-0.07283668</span> <span class="number">-0.12607698</span> <span class="number">-0.05489173</span>  <span class="number">0.06213264</span>]</div><div class="line">  [ <span class="number">0.01166963</span>  <span class="number">0.02953469</span>  <span class="number">0.03331421</span>  <span class="number">0.09969857</span> <span class="number">-0.07744646</span>  <span class="number">0.03921037</span>  <span class="number">-0.11335107</span> <span class="number">-0.01561479</span>  <span class="number">0.03017359</span>  <span class="number">0.13571448</span>]]</div><div class="line"></div><div class="line"> [[<span class="number">-0.05919386</span> <span class="number">-0.00281228</span>  <span class="number">0.00711866</span>  <span class="number">0.06299696</span> <span class="number">-0.04266599</span>  <span class="number">0.0259747</span>  <span class="number">-0.07946968</span> <span class="number">-0.00289627</span> <span class="number">-0.02592751</span>  <span class="number">0.07808545</span>]</div><div class="line">  [ <span class="number">0.03129078</span> <span class="number">-0.02892244</span> <span class="number">-0.01596121</span> <span class="number">-0.0068038</span>   <span class="number">0.04108508</span>  <span class="number">0.01717525</span>  <span class="number">0.02310689</span>  <span class="number">0.0062713</span>   <span class="number">0.01016119</span> <span class="number">-0.05758133</span>]</div><div class="line">  [ <span class="number">0.2078819</span>  <span class="number">-0.07376988</span> <span class="number">-0.12247892</span> <span class="number">-0.07339147</span>  <span class="number">0.06875815</span> <span class="number">-0.07224105</span>  <span class="number">0.09830238</span>  <span class="number">0.04630288</span> <span class="number">-0.03923044</span> <span class="number">-0.15668869</span>]</div><div class="line">  [ <span class="number">0.</span>          <span class="number">0.</span>          <span class="number">0.</span>          <span class="number">0.</span>          <span class="number">0.</span>          <span class="number">0.</span>          <span class="number">0.</span></div><div class="line">    <span class="number">0.</span>          <span class="number">0.</span>          <span class="number">0.</span>        ]</div><div class="line">  [ <span class="number">0.</span>          <span class="number">0.</span>          <span class="number">0.</span>          <span class="number">0.</span>          <span class="number">0.</span>          <span class="number">0.</span>          <span class="number">0.</span></div><div class="line">    <span class="number">0.</span>          <span class="number">0.</span>          <span class="number">0.</span>        ]]]</div><div class="line"></div><div class="line"><span class="comment">## 以下是last_states输出结果：</span></div><div class="line">LSTMStateTuple(</div><div class="line">c=array([[ <span class="number">0.02389863</span>,  <span class="number">0.06531061</span>,  <span class="number">0.06234521</span>,  <span class="number">0.20854867</span>, <span class="number">-0.18754284</span>,  <span class="number">0.08002822</span>, <span class="number">-0.2021616</span> , <span class="number">-0.04034186</span>,  <span class="number">0.05810034</span>,  <span class="number">0.24871611</span>],</div><div class="line">       [ <span class="number">0.45062326</span>, <span class="number">-0.10235791</span>, <span class="number">-0.27717666</span>, <span class="number">-0.1610663</span> ,  <span class="number">0.23795195</span>,  <span class="number">-0.12335596</span>,  <span class="number">0.16761175</span>,  <span class="number">0.07196362</span>, <span class="number">-0.0869157</span> , <span class="number">-0.29036735</span>]]), </div><div class="line">h=array([[ <span class="number">0.01166963</span>,  <span class="number">0.02953469</span>,  <span class="number">0.03331421</span>,  <span class="number">0.09969857</span>, <span class="number">-0.07744646</span>,  <span class="number">0.03921037</span>, <span class="number">-0.11335107</span>, <span class="number">-0.01561479</span>,  <span class="number">0.03017359</span>,  <span class="number">0.13571448</span>],</div><div class="line">       [ <span class="number">0.2078819</span> , <span class="number">-0.07376988</span>, <span class="number">-0.12247892</span>, <span class="number">-0.07339147</span>,  <span class="number">0.06875815</span>,  <span class="number">-0.07224105</span>,  <span class="number">0.09830238</span>,  <span class="number">0.04630288</span>, <span class="number">-0.03923044</span>, <span class="number">-0.15668869</span>]]))</div></pre></td></tr></table></figure></p>
+<p>既然有dynamic_rnn，自然也就有static_rnn，来看下static_rnn的参数：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">static_rnn</span><span class="params">(cell,</span></span></div><div class="line">               inputs,</div><div class="line">               initial_state=None,</div><div class="line">               dtype=None,</div><div class="line">               sequence_length=None,</div><div class="line">               scope=None):</div></pre></td></tr></table></figure></p>
+<h2 id="2-3-tensorflow中的双向RNN"><a href="#2-3-tensorflow中的双向RNN" class="headerlink" title="2.3 tensorflow中的双向RNN"></a>2.3 tensorflow中的双向RNN</h2><p>tensorflow提供了双向RNN接口:tf.nn.bidirectional_dynamic_rnn()，我们首先来看一下这个API的解释：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">bidirectional_dynamic_rnn</span><span class="params">(cell_fw, cell_bw, inputs, sequence_length=None, initial_state_fw=None, initial_state_bw=None, dtype=None, parallel_iterations=None, swap_memory=False, time_major=False, scope=None)</span>:</span></div></pre></td></tr></table></figure></p>
+<p><strong>函数参数说明：</strong><br>cell_fw/cell_bw：定义前向和反向的rnn cell；<br>inputs：输入序列；<br>sequence_length：序列长度；<br>initial_state_fw/initial_state_bw：前向、后向rnn_cell的初始化状态，一般初始化为全零状态；<br>dtype：数据类型；<br>time_major：一个很重要的参数，决定了输入和输出的格式，如果time_major为True，那么输出就是时序优先级，输入/输出的tensor格式必须为[max_time, batch_size, depth]，如果time_major为False，那么就是bacth优先级的，输入/输出的格式必须为[batch_size, max_time, depth]；默认情况下，time_major=False，这是因为大多数情况下，tensorflow处理数据都是以batch为单位的，但是当time_major=True时会更高效一些，因为当time_major=True时，可以避免开始和结束时tensor类型的转化开销；其中depth表示输入的词向量的维度（也就是embedding size的大小），max_time可以理解为句子的长度（一般以一个batch中最长的句子为准，不够的需要做padding）。</p>
+<p><strong>函数返回值</strong><br>bidirectional_dynamic_rnn返回一个(outputs, outputs_state)形式的一个元祖。<br>其中：</p>
+<blockquote>
+<ul>
+<li>outputs=(outputs_fw, outputs_bw)，是一个包含前向cell和后向cell输出tensor组成的元组；如果time_major=False，则两个tensor的shape为[batch_size, max_time, depth]，应用在文本中，max_time可以理解为句子的长度（一般以最长的句子为准，短句需要做padding），depth为输入句子词向量的维度；</li>
+<li>outputs_state=(outputs_state_fw, outputs_state_bw)，包含了前向和后向最后的隐藏状态组成的元组，outputs_state_fw和outputs_state_bw的类型都是LSTMStateTuple，是由(c, h)组成，分别代表memory cell和hidden state状态；</li>
+</ul>
+</blockquote>
+<p>因为bidirectional_dynamic_rnn返回的是前向、后向的结果，最终的结果还需要对前向、后向结果做拼接，利用tf.concat(outputs, 2)即可。</p>
+<p><strong>前向和后向cell的定义</strong><br>cell_fw和cell_bw的定义完全一样的，如果两个cell都是LSTM的话就是双向LSTM，如果两个cell都是GRU的话，就是双向GRU：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">HIDDEN_SIZE = <span class="number">100</span></div><div class="line"><span class="comment">## 定义LSTM</span></div><div class="line">cell_lstm_fw = tf.nn.rnn_cell.LSTMCell(HIDDEN_SIZE)</div><div class="line">cell_lstm_bw = tf.nn.rnn_cell.LSTMCell(HIDDEN_SIZE)</div><div class="line"></div><div class="line"><span class="comment">## 定义GRU</span></div><div class="line">cell_gru_fw = tf.contrib.rnn.GRUCell(HIDDEN_SIZE)</div><div class="line">cell_gru_bw = tf.contrib.rnn.GRUCell(HIDDEN_SIZE)</div><div class="line"><span class="comment">## 或者用nn模块下的GRUCell也可以</span></div><div class="line">cell_gru_fw = tf.nn.rnn_cell.GRUCell(HIDDEN_SIZE)</div><div class="line">cell_gru_bw = tf.nn.rnn_cell.GRUCell(HIDDEN_SIZE)</div></pre></td></tr></table></figure></p>
+<p>这里有一点需要注意：<strong>RNN/LSTM/GRU在声明cell时，只需传入一个HIDDEN_SIZE即可，它会自动匹配输入数据的维度。</strong></p>
+<p>tf.contrib模块下的功能是开发者提供的，等功能得到进一步验证成熟之后，会被放入到官方的模块中。</p>
+<p>在bidirectional_dynamic_rnn函数内部，会通过array_ops.reverse_sequence函数将输入序列逆序排列，使其达到反向传播的效果。</p>
+<p>在实现的时候，只需将定义好的两个cell作为参数传入即可：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">(outputs, outputs_state) = tf.nn.bidirectional_dynamic_rnn(cell_gru_fw, cell_gru_bw, inputs_embedded)</div></pre></td></tr></table></figure></p>
+<p>需要注意的是，inputs_embedded为输入的tensor，格式为[batch_size, max_time, depth]。</p>
+<p>最终的outputs = tf.concat((outputs_fw, outputs_bw), 2)或者直接是outputs = tf.concat(outputs, 2)。</p>
+<p>如果还需要用到最后的输出状态，则需要进一步对(outputs_state_fw, outputs_state_bw)做处理：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">final_state_c = tf.concat((outputs_state_fw.c, outputs_state_bw.c), <span class="number">1</span>)</div><div class="line">final_state_h = tf.concat((outputs_state_fw.h, outputs_state_bw.h), <span class="number">1</span>)</div><div class="line">outputs_final_state = tf.contrib.rnn.LSTMStateTuple(c=final_state_c, h=final_state_h)</div></pre></td></tr></table></figure></p>
+<p>下面给出一个基本的双向LSTM实现步骤：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf </div><div class="line"></div><div class="line">vocab_size = <span class="number">1000</span></div><div class="line">embedding_size = <span class="number">50</span></div><div class="line">batch_size =<span class="number">100</span></div><div class="line">max_time = <span class="number">10</span></div><div class="line">hidden_units = <span class="number">10</span></div><div class="line"></div><div class="line">inputs = tf.placeholder(shape=(batch_size, max_time), dtype=tf.int32, name=<span class="string">'inputs'</span>)</div><div class="line">embedding = tf.Variable(tf.random_uniform([vocab_size, embedding_size], <span class="number">-1.0</span>, <span class="number">1.0</span>), dtype=tf.float32)</div><div class="line">inputs_embeded = tf.nn.embedding_lookup(embedding, inputs)</div><div class="line">lstm_cell = tf.nn.rnn_cell.BasicLSTMCell(hidden_units)</div><div class="line"></div><div class="line">((outputs_fw, outputs_bw), (outputs_state_fw, outputs_state_bw)) = tf.nn.bidirectional_dynamic_rnn(lstm_cell, lstm_cell, inputs_embeded, sequence_length=max_time)</div><div class="line"></div><div class="line">outputs = tf.concat((outputs_fw, outputs_bw), <span class="number">2</span>)</div><div class="line">final_state_c = tf.concat((outputs_state_fw.c, outputs_state_bw.c), <span class="number">1</span>)</div><div class="line">final_state_h = tf.concat((outputs_state_fw.h, outputs_state_bw.h), <span class="number">1</span>)</div><div class="line">outputs_final_state = tf.contrib.rnn.LSTMStateTuple(c=final_state_c,</div><div class="line">                                                    h=final_state_h)</div></pre></td></tr></table></figure></p>
+<p>以上就是一个基本的双向LSTM实现流程。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p>[1] <a href="https://sthsf.github.io/2017/08/31/Tensorflow基础知识-bidirectional-rnn/" target="_blank" rel="external">https://sthsf.github.io/2017/08/31/Tensorflow基础知识-bidirectional-rnn/</a><br>[2] <a href="http://www.cnetnews.com.cn/2017/1118/3100705.shtml" target="_blank" rel="external">http://www.cnetnews.com.cn/2017/1118/3100705.shtml</a><br>[3] <a href="http://blog.csdn.net/wuzqChom/article/details/75453327" target="_blank" rel="external">http://blog.csdn.net/wuzqChom/article/details/75453327</a><br>[4] <a href="http://blog.csdn.net/u012436149/article/details/71080601" target="_blank" rel="external">http://blog.csdn.net/u012436149/article/details/71080601</a><br>[5] 深度学习与自然语言处理(7)_斯坦福cs224d 语言模型，RNN，LSTM与GRU:<a href="https://www.zybuluo.com/hanxiaoyang/note/438990" target="_blank" rel="external">https://www.zybuluo.com/hanxiaoyang/note/438990</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/深度学习/" rel="tag"># 深度学习</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/01/21/读书笔记之《一个广告人的自白》&《广告文案》/" rel="next" title="读书笔记之《一个广告人的自白》&《广告文案》">
+                <i class="fa fa-chevron-left"></i> 读书笔记之《一个广告人的自白》&《广告文案》
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2018/02/12/RNN原理详解以及tensorflow中的RNN实现/"
+           data-title="RNN原理详解以及tensorflow中的RNN实现" data-url="https://xdrush.github.io/2018/02/12/RNN原理详解以及tensorflow中的RNN实现/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xtapc.com2.z0.glb.clouddn.com/mywebsite_icon.JPG"
+               alt="Dong Xu" />
+          <p class="site-author-name" itemprop="name">Dong Xu</p>
+          <p class="site-description motion-element" itemprop="description">Ideas worth spreading and sharing...</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">38</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-RNN原理"><span class="nav-number">1.</span> <span class="nav-text">1 RNN原理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-RNN的时序反向传播原理"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 RNN的时序反向传播原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-1-时序反向传播算法"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.1.1 时序反向传播算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-2-梯度消失问题"><span class="nav-number">1.1.2.</span> <span class="nav-text">1.1.2 梯度消失问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-RNN变体之LSTM"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 RNN变体之LSTM</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-1-遗忘门"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.2.1 遗忘门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-2-输入门"><span class="nav-number">1.2.2.</span> <span class="nav-text">1.2.2 输入门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-3-输出门"><span class="nav-number">1.2.3.</span> <span class="nav-text">1.2.3 输出门</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-3-RNN变体之GRU"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 RNN变体之GRU</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-Tensorflow中的RNN实现"><span class="nav-number">2.</span> <span class="nav-text">2 Tensorflow中的RNN实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-tensorflow中的RNN"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 tensorflow中的RNN</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-关于output和state"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 关于output和state</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-dynamic-rnn和static-rnn"><span class="nav-number">2.3.</span> <span class="nav-text">2.2 dynamic_rnn和static_rnn</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-tensorflow中的双向RNN"><span class="nav-number">2.4.</span> <span class="nav-text">2.3 tensorflow中的双向RNN</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">3.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Dong Xu</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"xdrush"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="custom_mathjax_source">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
