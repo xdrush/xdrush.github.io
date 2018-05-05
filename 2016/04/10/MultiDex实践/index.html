@@ -1,0 +1,928 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Android,RxAndroid,RxJava," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="Why MultiDex?Android应用65535方法数的限制一直为广大开发者所诟病，在应用功能越来越丰富、各种开源库越来越多的今天，65k方法数瓶颈俨然已是一大绊脚石。至于怎么解决这个问题，先来看看google官方给出的方案：  插件化  将应用的非核心功能做成单独的App，实现该App和插件App相关的接口即可，实现以及体验如何，大家不妨来体验下Dolphin浏览器（这里做个小广告）。">
+<meta name="keywords" content="Android,RxAndroid,RxJava">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MultiDex实践">
+<meta property="og:url" content="https://xdrush.github.io/2016/04/10/MultiDex实践/index.html">
+<meta property="og:site_name" content="XDRush">
+<meta property="og:description" content="Why MultiDex?Android应用65535方法数的限制一直为广大开发者所诟病，在应用功能越来越丰富、各种开源库越来越多的今天，65k方法数瓶颈俨然已是一大绊脚石。至于怎么解决这个问题，先来看看google官方给出的方案：  插件化  将应用的非核心功能做成单独的App，实现该App和插件App相关的接口即可，实现以及体验如何，大家不妨来体验下Dolphin浏览器（这里做个小广告）。">
+<meta property="og:updated_time" content="2017-12-16T03:06:05.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MultiDex实践">
+<meta name="twitter:description" content="Why MultiDex?Android应用65535方法数的限制一直为广大开发者所诟病，在应用功能越来越丰富、各种开源库越来越多的今天，65k方法数瓶颈俨然已是一大绊脚石。至于怎么解决这个问题，先来看看google官方给出的方案：  插件化  将应用的非核心功能做成单独的App，实现该App和插件App相关的接口即可，实现以及体验如何，大家不妨来体验下Dolphin浏览器（这里做个小广告）。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xdrush.github.io/2016/04/10/MultiDex实践/"/>
+
+
+
+
+
+  <title> MultiDex实践 | XDRush </title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">XDRush</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle">Ideas worth spreading and sharing...</p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="https://xdrush.github.io/2016/04/10/MultiDex实践/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Dong Xu">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xtapc.com2.z0.glb.clouddn.com/mywebsite_icon.JPG">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="XDRush">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="XDRush" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                MultiDex实践
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-04-10T23:02:39+08:00">
+                2016-04-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/04/10/MultiDex实践/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/10/MultiDex实践/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Why-MultiDex"><a href="#Why-MultiDex" class="headerlink" title="Why MultiDex?"></a>Why MultiDex?</h2><p>Android应用65535方法数的限制一直为广大开发者所诟病，在应用功能越来越丰富、各种开源库越来越多的今天，65k方法数瓶颈俨然已是一大绊脚石。至于怎么解决这个问题，先来看看google官方给出的方案：</p>
+<ol>
+<li>插件化</li>
+</ol>
+<p>将应用的非核心功能做成单独的App，实现该App和插件App相关的接口即可，实现以及体验如何，大家不妨来体验下<a href="https://play.google.com/store/apps/details?id=mobi.mgeek.TunnyBrowser&amp;hl=en" target="_blank" rel="external">Dolphin浏览器</a>（这里做个小广告）。</p>
+<ol>
+<li>MultiDex<a id="more"></a>
+多dex实现，对大多数App，解压其apk，一般只有一个classes.dex文件，采用MultiDex的App解压可以看到有classes.dex,classes2.dex,…classes(N).dex，这样每个dex都可以最大承载65535个方法，很大限度的解决了单dex方法数限制。</li>
+</ol>
+<p>下文将详细介绍MultiDex如何实现。</p>
+<h2 id="MultiDex初步实现"><a href="#MultiDex初步实现" class="headerlink" title="MultiDex初步实现"></a>MultiDex初步实现</h2><h3 id="google官方MultiDex实现"><a href="#google官方MultiDex实现" class="headerlink" title="google官方MultiDex实现"></a>google官方MultiDex实现</h3><p><a href="http://developer.android.com/intl/zh-cn/tools/building/multidex.html" target="_blank" rel="external">Google官方MultiDex实现</a>用起来比较简单：</p>
+<ul>
+<li><p>gradle中添加MultiDex支持</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">multiDexEnable <span class="keyword">true</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>加载classes2.dex</p>
+</li>
+</ul>
+<p>AndroidManifest.xml的application中添加MultiDexApplication，或者如果已经重载Application，则在onAttachBaseContext()中执行MultiDex.install()即可加载dex2。</p>
+<p>官方方案简单易用，但遗留的问题也不少，具体注意事项可以google官文有很详细的阐述，这里不再讨论，但使用时有一点需要注意，那就是只有在应用方法数接近65k(注意是接近65k而非确切的65k，之所以提到是因为这个坑导致了线上一个版本hotfix)时才会打包为2个dex文件，具体超过多少个方法数会打包多个dex可以通过设置dx的’–set-max-idx-number’来决定。</p>
+<h3 id="MultiDex初步应用"><a href="#MultiDex初步应用" class="headerlink" title="MultiDex初步应用"></a>MultiDex初步应用</h3><p>最初版本，App还只是超过65535大概上百个方法，就按google官方方案对App进行多dex支持，启动发现无任何异常(包括启动速度、启动ANR、Crash等)，classes2.dex也只有带该二三十KB大小，暗自窃喜了一小阵子！好景不长，随着下一个版本一个新的SDK的引入，导致classes2.dex文件达到了200KB，测试发现不少机型启动ANR或者crash，或者启动时间过长，再次去看了google提出的MultiDex存在的问题，嗯，发现基本都是描述的那些问题！</p>
+<p>接下来在上个版本的基础上稍作改动，先来看下App启动流程：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Application.attachBaseContext()-&gt;Application.onCreate() -&gt; MainActivity.onCreate -&gt;</div><div class="line">MainActivity.onStart() -&gt; MainActivity.onResume()</div></pre></td></tr></table></figure></p>
+<p>不难发现，Application.attachBaseContext是我们能控制的最早执行的代码，在这个方法里面执行MultiDex.install()无疑是最佳时机。还有一点我们需要了解，Dalvik虚拟机首次启动对classes.dex执行DEXOPT操作非常耗时，而执行MultiDex.install()必然会再次对classes2.dex执行DEXOPT等操作，所有这些操作必须在5s内完成，否则ANR给你看！非首次启动则直接从cache中读取已经执行过dexopt的文件ODEX，这个过程对启动并无太大影响（测试中发现首次启动dex2加载需要1~2s，非首次启动几十ms左右），这也大概就是为什么classes2.dex不能太大的一个原因。基于此，对attachBaseContext稍作改动：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">attachBaseContext</span><span class="params">(<span class="keyword">final</span> Context base)</span> </span>&#123;</div><div class="line">    <span class="keyword">super</span>.attachBaseContext(base);</div><div class="line">    <span class="comment">// <span class="doctag">TODO:</span> your init code here.</span></div><div class="line">    initOperationBeforeDex2Installed();</div><div class="line">    <span class="keyword">boolean</span> isAppFirstLaunch = FirstLaunchManager.getInstance().firstLaunch();</div><div class="line">    <span class="keyword">if</span> (isAppFirstLaunch) &#123;     <span class="comment">// 首次启动</span></div><div class="line">        <span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">                MultiDex.install(base);</div><div class="line">                <span class="comment">// <span class="doctag">TODO:</span> your init code here, some init operation of which some classes were divided into dex2.</span></div><div class="line">                initOperationAfterDex2Installed();</div><div class="line">            &#125;</div><div class="line">        &#125;).start();</div><div class="line">    &#125; <span class="keyword">else</span> &#123;        <span class="comment">// 非首次启动</span></div><div class="line">        MultiDex.install(base);</div><div class="line">        <span class="comment">// <span class="doctag">TODO:</span> your init code here, some init operation of which some classes were divided into dex2.</span></div><div class="line">        initOperationAfterDex2Installed();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>以上逻辑便是改动之后的初步实现，首次启动开启一个线程来加载dex2，防止阻塞UI线程，非首次启动则同步执行；initOperationAfterDex2Installed()方法是根据Classes2.dex中结果，将涉及到的相关初始化工作移到dex2加载完之后执行，避免启动问题。当然这么做还不够，现在很多App在首次启动时引入闪屏页，我们的App首次启动也有一个FirstLaunchActivity来实现闪屏，闪屏结束之后就进入MainActivity，在进入MainActivity之前，运行一段阻塞代码来判断dex2是否加载完毕，如果dex加载完成，则立即进入MainActivity，如果尚未加载完毕，则阻塞等待dex2加载完毕，这么做主要还是为了避免启动过程中的ANR/Crash。</p>
+<h3 id="MultiDex引起的ANR-Crash"><a href="#MultiDex引起的ANR-Crash" class="headerlink" title="MultiDex引起的ANR/Crash"></a>MultiDex引起的ANR/Crash</h3><p>ANR！！Crash！！对，这就是MultiDex引起的坑！通过以上方法初步实现了MultiDex，但时不时QA就来找我：“这个机型ANR了”，“这个机型又ANR了”，“这个机型怎么又Crash了”，“这个手机启动不了”，简直令人抓狂！云测试通过率也没之前的高！实际上所有这些都是同一个问题导致的：dex2没加载完成之前，程序调用了dex2中的类或者方法！adb logcat看下，基本也就是4类问题引起的：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">(<span class="number">1</span>) NoClassDefFoundError</div><div class="line">(<span class="number">2</span>) <span class="function">Could not find <span class="title">class</span></span></div><div class="line"><span class="params">(<span class="number">3</span>)</span> Could not find <span class="title">method</span></div><div class="line"><span class="params">(<span class="number">4</span>)</span> NDK Error</div></pre></td></tr></table></figure></p>
+<p>这里需重点讨论下NDK error，这种问题是在有JNI调用的时候才会发生，并且出现的比较诡异，我也是在云测试的时候才注意到这个问题的严重性，通过观察启动的log，查找SIGSEGV，died等关键字，发现在这些关键字附近会有诸如“unable to find **”，其实这里就是没有找到的类引起的NDK error的关键所在，解决方法当然就是将这些类放到classes.dex中。个人建议在用MultiDex时，多次启动看logcat，重点关注以上3个类型的信息！知道了哪些类引起的错误之后，只需将这些类强制分到classes.dex中即可。那么如何实现呢？这里还得简要了解下MultiDex编译过程以及涉及到分包的几个重要task。</p>
+<h3 id="MultiDex编译过程"><a href="#MultiDex编译过程" class="headerlink" title="MultiDex编译过程"></a>MultiDex编译过程</h3><h4 id="gradle-task简介"><a href="#gradle-task简介" class="headerlink" title="gradle task简介"></a>gradle task简介</h4><p>限于篇幅这里不对gradle、groovy作介绍，想了解的google上有不少好资料，这里只简要介绍gradle中的task以及MultiDex编译过程中重要的几个task，这是最终MultiDex实现的关键。</p>
+<p>task，顾名思义就是任务的意思，是执行Project构建的基本单位，一个工程所有的构建最终是由一个个task来完成，这里我们来分析一个简单的build日志（PS：当我们输入gradle build按下Enter之后，屏幕上biu的一下多了不少日志信息，实际上这些日志信息就是一个个task的输出信息，阅读build日志对我们理解整个工程的构建大有裨益），以下面一段build日志为例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">MyProject:generateReleaseSources</div><div class="line">MyProject:processReleaseJavaRes</div><div class="line">MyProject:compileReleaseNdk UP-TO-DATE</div><div class="line">MyProject:compileReleaseSources</div><div class="line">MyProject:collectReleaseMultiDexComponents</div><div class="line">MyProject:proguardRelease</div></pre></td></tr></table></figure></p>
+<p>日志中，generateReleaseSources、processReleaseJavaRes…、proguardRelease都是构建过程中依次执行的task任务，这些task分别完成不同的功能，欲知更多task信息，RTFSC无疑是不二选择，gradle相关task源码请移步这里。MultiDex编译过程最重要的task主要有3个：</p>
+<h5 id="collect-Release-Debug-MultiDexComponents"><a href="#collect-Release-Debug-MultiDexComponents" class="headerlink" title="collect{Release/Debug}MultiDexComponents"></a>collect{Release/Debug}MultiDexComponents</h5><p>这个task扫描AndroidManifest.xml文件中的application、activity、receiver、provider、service等相关类，这将这些类信息写入到manifest_keep.txt文件中，该文件位于build/intermediates/multi-dex/{release/debug}目录下。</p>
+<h5 id="shrink-Release-Debug-MultiDexComponents"><a href="#shrink-Release-Debug-MultiDexComponents" class="headerlink" title="shrink{Release/Debug}MultiDexComponents"></a>shrink{Release/Debug}MultiDexComponents</h5><p>这个task会根据proguard规则以及manifest_keep.txt文件来进一步优化manifest_keep.txt，将其中没有用到的类删除，最终生成componentClasses.jar文件，该文件同样位于build/intermediates/multi-dex/{release/debug}目录下。</p>
+<h5 id="create-Release-Debug-MainDexClassList"><a href="#create-Release-Debug-MainDexClassList" class="headerlink" title="create{Release/Debug}MainDexClassList"></a>create{Release/Debug}MainDexClassList</h5><p>这个task会根据上步中生成的componentClasses.jar文件中的类，递归扫描这些类所有相关的依赖类，最终形成maindexlist.txt文件，该文件也位于build/intermediates/multi-dex/{release/debug}目录下，这个文件中的类最终会打包进classes.dex中。需要注意的是，maindexlist.txt文件并没有完全列出有所的依赖类，如果发现要查找的那个class不在maindexlist中，也无需奇怪。如果一定要确保某个类分到主dex中，将该类的完整路径加入到maindexlist中即可，这里要注意，如果加入的类并不在project中，则gradle构建会忽略这个类，如果加入了多个相同的类，则只取其中一个。这3个task在build日志中都能找到。</p>
+<h3 id="MultiDex-ANR-Crash解决方法"><a href="#MultiDex-ANR-Crash解决方法" class="headerlink" title="MultiDex ANR/Crash解决方法"></a>MultiDex ANR/Crash解决方法</h3><p>知道了上面的几个task，回到前面的问题：如何将某个类强制打包到classes.dex中？上面的3个task已经给出了答案！对，只需将该类完整路径添加到maindexlist.txt文件中即可！create{Debug/Release}MainDexClassList这个task正是实现这个操作的关键，主要代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">tasks.whenTaskAdded &#123; task -&gt;</div><div class="line">    <span class="keyword">if</span> (task.name.startsWith(<span class="string">"create"</span>) &amp;&amp; task.name.endsWith(<span class="string">"MainDexClassList"</span>) &#123;</div><div class="line">        task.doLast &#123;</div><div class="line">            <span class="function">File tempFile</span></div><div class="line">            File keepFile</div><div class="line">            <span class="title">if</span> <span class="params">(task.name.contains(<span class="string">"Debug"</span>)</span>) &#123;</div><div class="line">                tempFile = <span class="keyword">new</span> File(<span class="string">"$project.rootDir/MyProject/keep_in_maindexlist_debug.txt"</span>)</div><div class="line">                keepFile = <span class="keyword">new</span> File(<span class="string">"$&#123;project.buildDir&#125;/intermediates/debug/maindexlist.txt"</span>)</div><div class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (task.name.contains(<span class="string">"Release"</span>)) &#123;</div><div class="line">                tempFile = <span class="keyword">new</span> File(<span class="string">"project.rootDir/MyProject/keep_in_maindexlist_release.txt"</span>)</div><div class="line">                keepFile = <span class="keyword">new</span> File(<span class="string">"&#123;project.buildDir&#125;/intermediates/release/maindexlist.txt"</span>)</div><div class="line">            &#125;</div><div class="line">            </div><div class="line">            tempFile.eachLine(<span class="string">"utf-8"</span>) &#123; str, linenumber -&gt;</div><div class="line">                keepFile.append(str + <span class="string">"\n"</span>)</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这里将需要强制分到classes.dex中的类放在keep_inmaindexlist{debug/release}.txt，这种实现方式基本能够解决眼前问题，但现在看来还是略显too simple too navie！主要问题是不可控性，任何一次对代码的改动都有可能导致不同的分包结果，这就可能隐藏着不同的类导致首次启动失败，大量测试结果事实上也证明了这种方法的不可控性。作为开发，代码的不可控性无疑无法忍受，如何改进这种方法使得MultiDex可控呢？与Dev Lead交流之中间接找到了一种改进的方案，下文细述这个方法。</p>
+<h2 id="MultiDex的一种改进实现"><a href="#MultiDex的一种改进实现" class="headerlink" title="MultiDex的一种改进实现"></a>MultiDex的一种改进实现</h2><p>那么该如何让MultiDex分包可控呢？我的做法是：找出启动过程中所有类及依赖类，强制放入到classes.dex中！这么做要求启动类不能太多(实际上大部分App从启动Application到进入MainActivity也就几个直接类)，同时尽量让主界面和二级界面充分解耦，如果不想对现有代码做太多改动，一种做法是以反射方式调用二级界面中的Activity(因为反射找不到依赖关系)，不过调用时得要先判断classes2.dex是否加载完，以防某些二级界面相关代码在classes2.dex中而引起的crash，这么做虽然对功能实现上并无影响，但可能导致代码可维护性降低。另外还有一点就是，我们可以控制哪些类在classes.dex中，但无法控制哪些类分到classes2.dex中(通过dx打包的方式就另当别论了)，以反射方式调用二级界面activity可以增大二级界面相关类分到dex2中的概率。</p>
+<h3 id="寻找启动类"><a href="#寻找启动类" class="headerlink" title="寻找启动类"></a>寻找启动类</h3><p>如何找出App启动到主界面显示这个过程中的所有类？网上能够找得到的方法比较少，美团有自己的脚本程序找启动依赖类，但人家没开！源！！啦！！！还好google找到了<a href="http://www.dependency-analyzer.org/" target="_blank" rel="external">CDA(Class Dependency Analyzer)</a>，通过这个工具，基本都能找到启动过程中所有Activity、Application等相关依赖类，通常会有一定偏差(会将某些系统方法也找出来了)，这时还需结合App的所有类来作进一步优化(获取App所有类只需反编译dex文件形成jar，解压jar包，再用shell相关工具处理即可得到)，取两者的交集基本就能找出所有启动依赖类了。这里有一点需注意：必须以debug版本的App来分析，下文会讲到为什么。</p>
+<h4 id="Release版本寻找启动类"><a href="#Release版本寻找启动类" class="headerlink" title="Release版本寻找启动类"></a>Release版本寻找启动类</h4><p>为什么要将Release版本单独拿出来说呢？对，就是因为混淆！混淆可能会导致每次编译形成的class文件名不同，代码的增加或者减小也会对混淆结果产生影响，这就可能导致每次编译所需的启动类名都不一样，而Debug版本因为不会进行代码混淆，因此启动过程中的类名基本变化不大。那么问题来了，如何确定Release版本启动依赖类呢？build日志！！对，通过编译日志，我们发现，proguard{Release/Debug}这个task在create{Release/Debug}MainDexClassList这个task之前执行，这意味着，在形成maindexlist之前，我们能够确切的知道哪些类进行了混淆以及混淆之后的类名！如何获知？proguard的产物给出了答案：build/outputs/mapping/release/目录下的4个txt文件就是proguard的产物：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">dump.txt:所有class文件的内部结构</div><div class="line">mapping.txt：源码与混淆之后的类、方法、属性名字之间的一一映射关系</div><div class="line">seeds.txt：未被混淆的类和属性</div><div class="line">usage.txt：从Apk中剥离的代码</div></pre></td></tr></table></figure></p>
+<p>这里mapping.txt文件正是我们需要的，至于另外的3个文件有兴趣的可以研究下。我们来看下mapping.txt中文本的结构：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">android.support.ActivityManagerCompat -&gt; android.support.a:</div><div class="line">    48:52:int getLargeMemoryClass() -&gt; a</div><div class="line">    62:83:boolean isHighEndGfx(android.content.Context) -&gt; a</div><div class="line">android.support.ClipboardManagerCompat -&gt; android.support.b:</div><div class="line">    29:32:android.support.ClipboardManagerCompat getInstance(android.content.Context) -&gt; a</div><div class="line">    java.lang.CharSequence getText() -&gt; a</div><div class="line">    void setText(java.lang.CharSequence) -&gt; a</div><div class="line">    boolean hasPrimaryClip() -&gt; b</div></pre></td></tr></table></figure></p>
+<p>从上述信息中，我们知道经过代码混淆，android.support.ActivityManagerCompat在release版中最终打包为android.support.a类，并且对其中的方法也进行了混淆。并且注意到，文本中对类混淆的行已”:”结尾，这下问题就有解了，根据startup_keep_list_debug.txt文件中的每一行，在mapping.txt中寻找其是否被混淆，如果被混淆了，则读取经过混淆的类，如果没有被混淆，则直接获取该类，通过这几个步骤，即可形成最终Release版本的启动依赖类，代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> (task.name.startsWith(<span class="string">"create"</span>) &amp;&amp; task.name.endsWith(<span class="string">"MainDexClassList"</span>)) &#123;</div><div class="line">    task.doLast &#123;</div><div class="line">        println <span class="string">"create MainDexClassList"</span></div><div class="line">        </div><div class="line">        File debugStartupFile = <span class="keyword">new</span> File(<span class="string">"$project.rootDir/MyProject/startup_keep_list_debug.txt"</span>)</div><div class="line">        </div><div class="line">        <span class="keyword">if</span> (task.name.contains(<span class="string">"Debug"</span>)) &#123;</div><div class="line">            keepFile = <span class="keyword">new</span> File(<span class="string">"$&#123;project.buildDir&#125;/intermediates/multi-dex/debug/maindexlist.txt"</span>)</div><div class="line">            </div><div class="line">            <span class="comment">// 情况maindexlist.txt</span></div><div class="line">            FileWriter fileWriter = <span class="keyword">new</span> FileWriter(keepFile)</div><div class="line">            fileWriter.write(<span class="string">""</span>)</div><div class="line">            fileWriter.close()</div><div class="line">            </div><div class="line">            <span class="comment">// 写入启动依赖类到maindexlist.txt中</span></div><div class="line">            debugStartupFile.eachLine(<span class="string">"utf-8"</span>) &#123; str, linenumber -&gt;</div><div class="line">                keepFile.append(str + <span class="string">"\n"</span>)</div><div class="line">            &#125;</div><div class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (task.name.contains(<span class="string">"Release"</span>) &#123;</div><div class="line">            File startupFile = <span class="keyword">new</span> File(<span class="string">"$&#123;project.buildDir&#125;/intermediates/multi-dex/release/maindexlist.txt"</span>)</div><div class="line">            </div><div class="line">            FileWriter fileWriter = <span class="keyword">new</span> FileWriter(startupFile)</div><div class="line">            fileWriter.write(<span class="string">""</span>)</div><div class="line">            fileWriter.close()</div><div class="line">            </div><div class="line">            File mappingFile = <span class="keyword">new</span> File(<span class="string">"$&#123;project.buildDir&#125;/outputs/mapping/release/mapping.txt"</span>)</div><div class="line">            debugStartupFile.eachLine(<span class="string">"utf-8"</span>) &#123; str, linenumber -&gt;</div><div class="line">                <span class="keyword">boolean</span> hasProguarded = <span class="keyword">false</span></div><div class="line">                mappingFile.eachLine(<span class="string">"utf-8"</span>) &#123; mapStr, linenumber1 -&gt;</div><div class="line">                    String string = mapStr.substring(<span class="number">0</span>, mapStr.indexOf(<span class="string">"-&gt;"</span>) - <span class="number">1</span>)</div><div class="line">                    string = string.replace(<span class="string">'.'</span>, <span class="string">'/'</span>)</div><div class="line">                    string += <span class="string">".class"</span></div><div class="line">                    <span class="keyword">if</span> (string.equals(str)) &#123;</div><div class="line">                        String strTmp = mapStr.substring(str.length() - <span class="number">2</span>)</div><div class="line">                        strTmp = strTmp.replace(<span class="string">'.'</span>, <span class="string">'/'</span>)</div><div class="line">                        strTmp = strTmp.replace(<span class="string">':'</span>, <span class="string">'.class'</span>)</div><div class="line">                        startupFile.append(strTmp + <span class="string">"\n"</span>)</div><div class="line">                        hasProguarded = <span class="keyword">true</span></div><div class="line">                        <span class="keyword">return</span></div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">if</span> (!hasProguarded) &#123;</div><div class="line">                startupFile.append(str + <span class="string">"\n"</span>)</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>至此，寻找启动类工作基本完成，但不难发现一个问题，那就是build release版本是将会更加耗时，从上面gradle脚本中不难发现，涉及到2层循环，并且mapping.txt文件通常有上万行，这也是这种方法最大的缺陷之一。构建得到APK之后，点击icon，貌似一切正常work！但，但，但，重要的事说三遍，至此并非所有事情都做完了，仍然可能会遗留一些问题！通过以上方法找到的启动依赖类并非100%正确，几千上万个类中遗漏几个毕竟不是小概率事件，解决方法还得多次启动，通过adb logcat获取启动日志，在日志中查找NoClassDefFoundError、Could not find class、Could not find method等warning，有必要的话仍需将这些形成warning的类添加到startup_keep_list_debug.txt文件中，多次启动，直到没有相关的warning，这么做是为了减小未知风险。至此，这种MultiDex实现方法基本也就完成了，后续会寻求其他更好的解决方案，比如动态加载dex方式等等。</p>
+<h2 id="MultiDex使用小结"><a href="#MultiDex使用小结" class="headerlink" title="MultiDex使用小结"></a>MultiDex使用小结</h2><p>以上基本上就是我实现MultiDex的整个过程，中间有多少坑只有实现了才知道！个人认为无必要和绝对把握还是远离它比较好，特别是针对用户量大的App，任何线上ANR/Crash的影响范围可想而知。</p>
+<ul>
+<li>提高代码质量应该足以避开MultiDex，毕竟人家微信这么大个App也才只有65428个方法，人家还没超65536呢！</li>
+<li>多次启动(指首次启动)查看启动log是必须的，一来测试MultiDex是否会对首次启动时间产生明显影响，最重要的还是查看启动过程中是否有找不到的类；</li>
+<li>通常多次云测也是必须的，毕竟QA能够覆盖到的机型有限，云测也节省了QA工作量。</li>
+</ul>
+<p>以上便是个人实现MultiDex的一种方式，不尽完美但却能够解决当下问题，但仍然在寻求最优的解决方法，当你看到这篇文章时，如果你有好的建议或者意见，请不吝赐教！</p>
+<h2 id="相关参考"><a href="#相关参考" class="headerlink" title="相关参考"></a>相关参考</h2><p>[1] <a href="http://developer.android.com/tools/building/multidex.html" target="_blank" rel="external">http://developer.android.com/tools/building/multidex.html</a><br>[2] <a href="http://blog.waynell.com/2015/04/19/android-multidex/" target="_blank" rel="external">http://blog.waynell.com/2015/04/19/android-multidex/</a><br>[3] <a href="http://tech.meituan.com/mt-android-auto-split-dex.html" target="_blank" rel="external">http://tech.meituan.com/mt-android-auto-split-dex.html</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/RxAndroid/" rel="tag"># RxAndroid</a>
+          
+            <a href="/tags/RxJava/" rel="tag"># RxJava</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/03/30/一篇文章带你了解Android之Gradle/" rel="next" title="一篇文章带你了解Android之Gradle">
+                <i class="fa fa-chevron-left"></i> 一篇文章带你了解Android之Gradle
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/04/24/Java进阶之SOLID原则/" rel="prev" title="Java进阶之SOLID原则">
+                Java进阶之SOLID原则 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/04/10/MultiDex实践/"
+           data-title="MultiDex实践" data-url="https://xdrush.github.io/2016/04/10/MultiDex实践/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xtapc.com2.z0.glb.clouddn.com/mywebsite_icon.JPG"
+               alt="Dong Xu" />
+          <p class="site-author-name" itemprop="name">Dong Xu</p>
+          <p class="site-description motion-element" itemprop="description">Ideas worth spreading and sharing...</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">38</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Why-MultiDex"><span class="nav-number">1.</span> <span class="nav-text">Why MultiDex?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MultiDex初步实现"><span class="nav-number">2.</span> <span class="nav-text">MultiDex初步实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#google官方MultiDex实现"><span class="nav-number">2.1.</span> <span class="nav-text">google官方MultiDex实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MultiDex初步应用"><span class="nav-number">2.2.</span> <span class="nav-text">MultiDex初步应用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MultiDex引起的ANR-Crash"><span class="nav-number">2.3.</span> <span class="nav-text">MultiDex引起的ANR/Crash</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MultiDex编译过程"><span class="nav-number">2.4.</span> <span class="nav-text">MultiDex编译过程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#gradle-task简介"><span class="nav-number">2.4.1.</span> <span class="nav-text">gradle task简介</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#collect-Release-Debug-MultiDexComponents"><span class="nav-number">2.4.1.1.</span> <span class="nav-text">collect{Release/Debug}MultiDexComponents</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#shrink-Release-Debug-MultiDexComponents"><span class="nav-number">2.4.1.2.</span> <span class="nav-text">shrink{Release/Debug}MultiDexComponents</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#create-Release-Debug-MainDexClassList"><span class="nav-number">2.4.1.3.</span> <span class="nav-text">create{Release/Debug}MainDexClassList</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MultiDex-ANR-Crash解决方法"><span class="nav-number">2.5.</span> <span class="nav-text">MultiDex ANR/Crash解决方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MultiDex的一种改进实现"><span class="nav-number">3.</span> <span class="nav-text">MultiDex的一种改进实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#寻找启动类"><span class="nav-number">3.1.</span> <span class="nav-text">寻找启动类</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Release版本寻找启动类"><span class="nav-number">3.1.1.</span> <span class="nav-text">Release版本寻找启动类</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MultiDex使用小结"><span class="nav-number">4.</span> <span class="nav-text">MultiDex使用小结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#相关参考"><span class="nav-number">5.</span> <span class="nav-text">相关参考</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Dong Xu</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"xdrush"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="custom_mathjax_source">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

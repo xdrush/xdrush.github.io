@@ -1,0 +1,908 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="机器学习," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="1 背景说明1.1 实际应用场景说明FM最早是在2010年提出，目的是解决大规模稀疏数据下的特征组合问题。关于数据稀疏的问题，在计算广告或者推荐系统等应用场景下，是常见的。 以移动端广告推荐为例，在日志系统中，每条pv日志和点击日志中，均包含有用户侧的信息（比如年龄，性别，国籍，手机上安装的app列表）、广告侧的信息（广告id，广告出价，广告标题，广告图片url，app包名，app允许在哪些国家展">
+<meta name="keywords" content="机器学习">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CTR预估算法之FM&#x2F;FFM">
+<meta property="og:url" content="https://xdrush.github.io/2017/01/23/CTR预估算法之FM:FFM/index.html">
+<meta property="og:site_name" content="XDRush">
+<meta property="og:description" content="1 背景说明1.1 实际应用场景说明FM最早是在2010年提出，目的是解决大规模稀疏数据下的特征组合问题。关于数据稀疏的问题，在计算广告或者推荐系统等应用场景下，是常见的。 以移动端广告推荐为例，在日志系统中，每条pv日志和点击日志中，均包含有用户侧的信息（比如年龄，性别，国籍，手机上安装的app列表）、广告侧的信息（广告id，广告出价，广告标题，广告图片url，app包名，app允许在哪些国家展">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/%E4%BA%8C%E9%98%B6%E5%A4%9A%E9%A1%B9%E5%BC%8F%E6%A8%A1%E5%9E%8B%E8%A1%A8%E8%BE%BE%E5%BC%8F.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/%E5%8D%8F%E5%90%8C%E8%BF%87%E6%BB%A4-%E7%9F%A9%E9%98%B5%E5%88%86%E8%A7%A3.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/FM%E5%8C%96%E7%AE%80%E6%AD%A5%E9%AA%A4.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/FM%E6%8E%A8%E5%AF%BC%E8%BF%87%E7%A8%8B.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/%E6%A8%A1%E5%9E%8B%E6%A2%AF%E5%BA%A6%E8%AE%A1%E7%AE%97.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/FFM%E8%A1%A8%E8%BE%BE%E5%BC%8F.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/FFM%E6%A0%B7%E6%9C%AC%E6%95%B0%E6%8D%AE.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/FFM%E6%A0%B7%E6%9C%AC%E6%98%A0%E5%B0%84.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/FFM%E4%BA%8C%E9%98%B6%E7%89%B9%E5%BE%81%E8%A1%A8%E7%A4%BA.png">
+<meta property="og:updated_time" content="2017-12-17T12:43:58.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="CTR预估算法之FM&#x2F;FFM">
+<meta name="twitter:description" content="1 背景说明1.1 实际应用场景说明FM最早是在2010年提出，目的是解决大规模稀疏数据下的特征组合问题。关于数据稀疏的问题，在计算广告或者推荐系统等应用场景下，是常见的。 以移动端广告推荐为例，在日志系统中，每条pv日志和点击日志中，均包含有用户侧的信息（比如年龄，性别，国籍，手机上安装的app列表）、广告侧的信息（广告id，广告出价，广告标题，广告图片url，app包名，app允许在哪些国家展">
+<meta name="twitter:image" content="http://7xtapc.com2.z0.glb.clouddn.com/%E4%BA%8C%E9%98%B6%E5%A4%9A%E9%A1%B9%E5%BC%8F%E6%A8%A1%E5%9E%8B%E8%A1%A8%E8%BE%BE%E5%BC%8F.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xdrush.github.io/2017/01/23/CTR预估算法之FM:FFM/"/>
+
+
+
+
+
+  <title> CTR预估算法之FM/FFM | XDRush </title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">XDRush</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle">Ideas worth spreading and sharing...</p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="https://xdrush.github.io/2017/01/23/CTR预估算法之FM:FFM/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Dong Xu">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xtapc.com2.z0.glb.clouddn.com/mywebsite_icon.JPG">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="XDRush">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="XDRush" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                CTR预估算法之FM/FFM
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-23T19:05:39+08:00">
+                2017-01-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/01/23/CTR预估算法之FM:FFM/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/01/23/CTR预估算法之FM:FFM/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="1-背景说明"><a href="#1-背景说明" class="headerlink" title="1 背景说明"></a>1 背景说明</h1><h2 id="1-1-实际应用场景说明"><a href="#1-1-实际应用场景说明" class="headerlink" title="1.1 实际应用场景说明"></a>1.1 实际应用场景说明</h2><p>FM最早是在2010年提出，目的是解决大规模稀疏数据下的特征组合问题。关于数据稀疏的问题，在计算广告或者推荐系统等应用场景下，是常见的。</p>
+<p>以移动端广告推荐为例，在日志系统中，每条pv日志和点击日志中，均包含有用户侧的信息（比如年龄，性别，国籍，手机上安装的app列表）、广告侧的信息（广告id，广告出价，广告标题，广告图片url，app包名，app允许在哪些国家展示）、上下文侧信息（包括用户手机浏览器speeddial个数，bookmark列表，最长访问的网站等，手机操作系统，渠道id），对于那些categorical类型的特征，比如国籍，安装的app列表，广告id等等，这种类型特征的取值仅仅是一个标识，本身并没有实际意义，更不能用来取值比较大。</p>
+<a id="more"></a>
+<p>以用户的年龄为例（通常情况下，我们将连续的特征离散化，方便one-hot标识），将年龄分为以下几个年龄段：0-15, 15-20, 20-25, 25-30, 30-35, 35-45, 45-200，之所以在20-40之间划分区间粒度较小是因为我们的用户主要集中在这个区间范围内。那么，当判断用户年龄分别在这几个区间中时，将年龄特征离散化表示为：<br>0-15: [1,0,0,0,0,0,0]<br>15-20: [0,1,0,0,0,0,0]<br>20-25: [0,0,1,0,0,0,0]<br>25-30: [0,0,0,1,0,0,0]<br>30-35: [0,0,0,0,1,0,0]<br>35-45: [0,0,0,0,0,1,0]<br>45-200: [0,0,0,0,0,0,1]</p>
+<p>可以发现，<strong>由one-hot编码带来的数据稀疏性会导致特征空间变大</strong>。在上面的例子中，一维categorical特征在经过one-hot编码后变成了7维数值型特征。真实应用场景中，还要处理广告id，app列表（几十维），国籍（200维左右），性别（二维）等等，这些特征经过one-hot编码之后，达到几万维甚至几十万维乃至几亿维也就不奇怪啦。</p>
+<p>此外，也能发现，<strong>特征空间增长的维度取决于categorical型特征的取值个数</strong>。在数据稀疏性的现实情况下，我们如何利用这些特征来提升模型性能呢？</p>
+<h2 id="1-2-为什么需要特征交叉"><a href="#1-2-为什么需要特征交叉" class="headerlink" title="1.2 为什么需要特征交叉"></a>1.2 为什么需要特征交叉</h2><p>大量的研究和实际数据表明：某些特征之间的关联信息对事件结果的发生会产生很大的影响。从实际业务线的广告点击数据分析来看，也确实印证了这样的结论。比如，在做广告推荐时，一个RPG类的游戏，显然年龄在10-30岁左右的男性用户点击这条广告的概率大一些；一个手机清理类软件，显然在Android OS低于5.0，手机存储空间又比较小的用户点击可能性更大一些；等等，诸如此种例子还有很多，可以很容易下结论，特征交叉对于最终结果必然有较大影响；</p>
+<p>那么特征交叉又该如何做呢？表征特征之间的关联，最直接的方法是构造组合特征。样本中特征之间的关联信息在one-hot编码和浅层模型（比如LR、SVM）中是难以做到的。目前工业界主要有一下集中方法来表示特征交叉：</p>
+<blockquote>
+<ul>
+<li>人工特征工程（数据分析 + 人工构造）</li>
+<li>通过模型表示组合特征（深度学习DSN，FM/FFM等方法）</li>
+</ul>
+</blockquote>
+<p> 下面就将详细阐述FM/FFM是如何来表征特征交叉的，以后还会介绍深度学习在特征交叉中的应用。</p>
+<h1 id="2-FM模型原理"><a href="#2-FM模型原理" class="headerlink" title="2 FM模型原理"></a>2 FM模型原理</h1><p>为了更好的了解FM模型，我们先从多项式回归、交叉组合特征说起，然后再过度到FM模型。</p>
+<h2 id="2-1-从二阶多项式模型到FM模型"><a href="#2-1-从二阶多项式模型到FM模型" class="headerlink" title="2.1 从二阶多项式模型到FM模型"></a>2.1 从二阶多项式模型到FM模型</h2><p>我们先来看看二阶多项式模型的表达式：<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/%E4%BA%8C%E9%98%B6%E5%A4%9A%E9%A1%B9%E5%BC%8F%E6%A8%A1%E5%9E%8B%E8%A1%A8%E8%BE%BE%E5%BC%8F.png" alt="二阶多项式模型表达式"></p>
+<p>其中$n$表示特征维度。从上式可知，交叉项中的组合特征参数个数一共有$\frac{n(n-1)}{2}$个，在这里，任意两个交叉项的系数$w_{ij}$都是独立的。然而，在数据非常稀疏的情况下，交叉项参数的学习是非常困难的。为什么呢？</p>
+<p>因为我们知道，<strong>回归模型的参数$w$的学习过程其实就是从训练样本中计算充分统计量</strong>，是一个统计的过程；由大数定理我们知道，统计过程是建立在大量的样本基础之上才有意义，而在这里交叉项的每一个参数$w<em>{ij}$的学习过程需要大量的$x_i$、$x_j$同时为非零的训练样本数据，然而经过one-hot编码之后，我们的样本数据本来就很稀疏，能够同时满足$x_i$和$x_j$都非零的样本数非常少，训练样本也就不充分，导致学习到的$w</em>{ij}$不是充分统计量的结果，因此$w_{ij}$就不准确、不稳定，这会严重影响模型的预测效果和稳定性。</p>
+<p>那么，如何在降低数据稀疏问题给模型性能带来的重大影响的同时，有效地解决二阶交叉项参数的学习问题呢？<strong>矩阵分解</strong>方法已经给出了解决思路。接触过<strong>协同过滤（CF）</strong>的同学应该知道，在基于model-based的协同过滤中，一个rating矩阵可以分解为一个user矩阵和一个item矩阵，每个uese和item都可以采用一个隐向量表示。如下图所示：<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/%E5%8D%8F%E5%90%8C%E8%BF%87%E6%BB%A4-%E7%9F%A9%E9%98%B5%E5%88%86%E8%A7%A3.png" alt="协同过滤矩阵分解示意图"></p>
+<p>上图中，将每一个user表示成一个二维向量，同时也将每个item表示成一个二维向量，两个向量的内积就是矩阵中user对item的打分。根据矩阵分解的启发，如果把多项式模型中二阶交叉项参数$w_{ij}$组成一个对称矩阵$W$，那么这个矩阵就可以分解为$W={VV^T}$，$V\in R^{n*k}$称为系数矩阵，其中第$i$行对应着第$i$维特征的隐向量（熟悉word2vec的同学一定不陌生，word2vec中也是用类似于隐向量的方式来表示一个word的）。</p>
+<p><strong>将每个交叉项参数$w_{ij}$用隐向量的内积$<v_i, v_j="">$来表示，正是FM模型的核心思想。</v_i,></strong></p>
+<h2 id="2-2-FM模型原理"><a href="#2-2-FM模型原理" class="headerlink" title="2.2 FM模型原理"></a>2.2 FM模型原理</h2><p>在这里我们只讨论二阶FM模型，其表达式为：<br>$y(x) := w<em>0 + \sum</em>{i=1}^nw<em>ix_i + \sum</em>{i=1}^n\sum_{j=i+1}^n<v_i, v_j="">x_ix_j$</v_i,></p>
+<p>其中$v<em>i$表示第$i$维特征的隐向量，$<v_i, v_j="">$表示两个长度为$k$的向量的内积，计算公式为：<br>$<v_i,v_j> = \sum</v_i,v_j></v_i,></em>{j=1}^kv<em>{i,f}v</em>{j,f}$<br>其中，$k$为隐向量的大小，是个经验值，一般不会取很大，通过多次试验，我们最终确定$k$的大小为4。</p>
+<p>直观的来看FM模型的表达式，前两项正是我们熟悉的LR，最后一项就是二阶特征交叉项，表示模型将两个独立的特征分量之间的关联信息考虑进来。用交叉项表示组合特征，从而建立特征与最终结果之间的非线性关系。</p>
+<p>由于FM模型是在LR的基础上加入了特征交叉，模型求解时不直接求特征交叉项的稀疏$w<em>{ij}$，而是采用隐向量的内积$<v_i,v_j>$来表示$w</v_i,v_j></em>{ij}$。具体的，FM在求解过程中的做法是：对每一个特征分量$x<em>i$引入隐向量$v_i=(v</em>{i,1},v<em>{i,2},…,v</em>{i,k})$，利用$v<em>iv_j^T$内积结果对交叉项系数$w</em>{ij}$进行估计，即有$w_{ij} := v_iv_j^T$。</p>
+<p>根据上式我们不难发现，二阶交叉项参数从$\frac{n(n-1)}{2}$减少到$n*k$个，由于通常情况下$n$要远远大于$k$，因此，FM参数要远少于二阶多项式模型中的参数数量。</p>
+<p>另外一个很重要的地方在于，<strong>用FM模型表示之后，使得$x_hx_i$的参数和$x_ix_j$的参数不再相互独立。</strong>这样我们就可以在样本稀疏的情况下相对合理的估计FM模型交叉项的参数。<br>$<v_h, v_i=""> := \sum<em>{f=1}^kv</em>{h,f}v<em>{i,f}$<br>$<v_i, v_j=""> := \sum</v_i,></em>{f=1}^kv<em>{i,f}v</em>{j,f}$<br>$x<em>hx_i$和$x_ix_j$的系数分别为$<v_h, v_i="">$和$<v_i, v_j="">$，它们之间有共同项$v_i$，也就是说，所有包含$x_i$的非零组合特征（也就是对某个$j\neq i$，有$x_ix_j \neq 0$）的样本都可以用来学习隐向量$v_i$，这就在很大程度上避免了因为数据稀疏造成的参数估计不准的影响。然而在二阶多项式模型中，参数$w</v_i,></v_h,></em>{ij}$和参数$w_{ih}$的学习过程是相互独立的，没有任何联系。</v_h,></p>
+<h2 id="2-3-FM参数学习过程"><a href="#2-3-FM参数学习过程" class="headerlink" title="2.3 FM参数学习过程"></a>2.3 FM参数学习过程</h2><p>从FM模型表达式中不难发现，FM模型的复杂度为$O(kn^2)$，但是通过下面的等式变换，可以将FM的二次项化简，即：<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/FM%E5%8C%96%E7%AE%80%E6%AD%A5%E9%AA%A4.png" alt="FM化简步骤"></p>
+<p>上式中，用$A$表示系数矩阵$V$的上三角元素，$B$表示系数矩阵的对角线上的交叉项系数，由于系数矩阵$V$是一个对称矩阵，因此有下式成立：<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/FM%E6%8E%A8%E5%AF%BC%E8%BF%87%E7%A8%8B.png" alt="FM推导过程"></p>
+<p>由此，最终FM模型可以复杂度可以优化为$O(kn)$。<br>如果采用SGD来学习模型参数，那么，模型各个参数的梯度如下：<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/%E6%A8%A1%E5%9E%8B%E6%A2%AF%E5%BA%A6%E8%AE%A1%E7%AE%97.png" alt="模型梯度计算"></p>
+<h2 id="2-4-模型计算复杂度"><a href="#2-4-模型计算复杂度" class="headerlink" title="2.4 模型计算复杂度"></a>2.4 模型计算复杂度</h2><p>由于$\sum<em>{j=1}^nv</em>{j,f}x<em>j$只与$f$有关，在参数迭代更新过程中，只需要计算第一次所有$f$的$\sum</em>{j=1}^nv<em>{j,f}x_j$，就能够方便地得到所有$v</em>{i,f}$的梯度。显然，计算所有$f$的$\sum<em>{j=1}^nv</em>{j,f}x<em>j$的复杂度为$O(kn)$；在已知$\sum</em>{j=1}^nv_{j,f}x_j$时，计算每个参数梯度的复杂度为$O(n)$；得到梯度之后，更新每个参数的复杂度为$O(1)$；模型一共有$nk+n+1$个，因此，FM模型训练的时间复杂度为$O(kn)$。综上所述，FM是一个非常高效的模型。</p>
+<h2 id="2-5-FM模型总结"><a href="#2-5-FM模型总结" class="headerlink" title="2.5 FM模型总结"></a>2.5 FM模型总结</h2><p>以上主要从FM模型的引入、FM模型的推导和参数学习过程介绍了FM模型，这里把FM最核心的部分总结一下：</p>
+<p><strong>（1）FM降低了交叉项参数学习不充分的影响</strong><br>one-hot编码后的样本数据非常稀疏，组合特征更是如此。为了解决交叉项参数学习不充分导致模型有偏或者不稳定的问题，作者借鉴了矩阵分解的思路：将每一维特征用$k$维的隐向量表示，交叉项的参数$w<em>{ij}$用对应的隐向量的内积表示，这样参数学习由之前学习交叉项参数$w</em>{ij}$的过程，转变为学习$n$个特征对应的$k$维隐向量的过程。很明显，单特征参数的学习要比交叉项参数$w_{ij}$学习得更充分。举例说明如下：<br>假设有10w个训练样本，其中性别为女性的样本数为3w，出现男性的样本数为7w，出现汽车的样本数为2000，出现化妆品的样本数为1000。出现&lt;女性，汽车&gt;的样本数为500，出现&lt;女性，化妆品&gt;的样本数为1000，出现&lt;男性，汽车&gt;的样本数为1500，出现&lt;男性，化妆品&gt;的样本数为0。可以看到，单特征对应的样本数远大于组合特征对应的样本数。训练时，单特征参数相对于交叉项特征参数会学习的更充分。<strong>因此，FM降低了因数据稀疏，导致交叉项参数学习不充分的影响。</strong></p>
+<p><strong>（2）FM提升了模型的预估能力</strong><br>上面的例子中，样本集中没有&lt;男性，化妆品&gt;的交叉特征，如果用多项式模型来建模，对应的交叉项参数$w<em>{男性,化妆品}$是学习不出来的，因为数据中没有对应的共现交叉特征，因此多项式模型就不能对出现的男性看化妆品广告场景给出准确的预估。<br>FM模型则没有这个问题。由于FM模型是把交叉项参数用对应的隐向量内积来表示，因此，$w</em>{男性,化妆品} = <v_{男性},v_{化妆品}>$，由于FM学习的参数就是但特征的隐向量，那么男性看化妆品广告的预估效果可以用$<v_{男性},v_{化妆品}>$得到。这样，即使训练样本中没有出现&lt;男性，化妆品&gt;的样本，FM模型依然可以用来做预估，提升了模型的预估能力。</v_{男性},v_{化妆品}></v_{男性},v_{化妆品}></p>
+<p><strong>（3）FM模型提升了参数学习效率</strong><br>由于参数的个数从多项式模型的$n^2 + n + 1$变成了$nk + n + 1$，模型训练的复杂度也有$O(n^2)$变成了$O(n*k<br>)$，因此FM模型提升了参数的学习效率。</p>
+<h1 id="3-FFM模型原理"><a href="#3-FFM模型原理" class="headerlink" title="3 FFM模型原理"></a>3 FFM模型原理</h1><p>FFM模型在FM的基础上借鉴了field的概念，是FM模型的升级版。通过引入field概念，FFM把相同的特征归于同一个field中（这个field通常称为slot）。在文章开始one-hot编码中提到的年龄特征，经过one-hot编码执行形成了7个特征，这7个特征都是用于描述用户年龄的，因此可以将其放在同一个field中。也就是说，我们可以把属于同一个categorical特征经过one-hot编码之后形成的数值型特征都可以放入到同一个field中。</p>
+<p>在FFM模型中，每一维特征$x<em>i$，针对其他特征的每一种“field”$f_j$，都会学习一个隐向量$v</em>{i,f_j}$，因此，隐向量不仅与特征相关，也和特征对应的field相关。</p>
+<p>假设每个样本的$n$个特征属于$f$个field，那么FFM的二次项就有$nf$个隐向量。而在FM模型中，每一维特征的隐向量只有一个。因此可以把FM当做是FFM的一个特例，那就是将所有的特征都归属于同一个field中。根据FFM的field敏感特征，FFM的表达式为：<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/FFM%E8%A1%A8%E8%BE%BE%E5%BC%8F.png" alt="FFM表达式"></p>
+<p>其中$f_j$是第$j$个特征所属的field。如果隐向量的长度为$k$，那么FFM的二阶交叉项参数个数就有$nfk$个，远多于FM模型的$nk$个。此外，由于隐向量与field有关，FFM的交叉项并不能够像FM那样做简化，因此其预测复杂度为$O(kn^2)$。</p>
+<p>这里结合一个例子来进一步说明FFM的原理。给定一个样本数据如下所示：<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/FFM%E6%A0%B7%E6%9C%AC%E6%95%B0%E6%8D%AE.png" alt="FFM样本数据"></p>
+<p>样本中，price是数值型特征，实际应用中通常会把价格划分为若干个区间（即连续特征离散化），然后再one-hot编码，这里假设$9.99对应的离散区间tag为2。当然并不是所有的连续型特征都要做离散化，比如某广告位、某类广告/商品、抑或是某类人群统计的历史CTR通常无需做离散化。</p>
+<p>这个样本可以编码为5个数值特征，即User-YuChin，Movie-3Idiots，Genre-Comedy，Genre-Drama，Price-2。其中，Genre-Comedy，Genre-Drama属于同一个field。为了说明FFM的样本格式，我们把所有的特征和对应的field映射成整数编号。<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/FFM%E6%A0%B7%E6%9C%AC%E6%98%A0%E5%B0%84.png" alt="FFM样本映射"></p>
+<p>那么，FFM所有的（二阶）组合特征共有10项，即为：<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/FFM%E4%BA%8C%E9%98%B6%E7%89%B9%E5%BE%81%E8%A1%A8%E7%A4%BA.png" alt="FFM二阶特征表示"></p>
+<p>上图中，红色表示field编号，蓝色表示feature编号，绿色表示样本的组合特征取值。二阶交叉项的系数是通过与field相关的隐向量的内积得到。如果单特征有$n$个，全部做二阶特征组合的化，会有$\frac{n(n-1)}{2}$个。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/机器学习/" rel="tag"># 机器学习</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/21/CTR预估算法之LR/" rel="next" title="CTR预估算法之LR">
+                <i class="fa fa-chevron-left"></i> CTR预估算法之LR
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/13/梯度下降法及其理解/" rel="prev" title="梯度下降法及其理解">
+                梯度下降法及其理解 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/01/23/CTR预估算法之FM:FFM/"
+           data-title="CTR预估算法之FM/FFM" data-url="https://xdrush.github.io/2017/01/23/CTR预估算法之FM:FFM/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xtapc.com2.z0.glb.clouddn.com/mywebsite_icon.JPG"
+               alt="Dong Xu" />
+          <p class="site-author-name" itemprop="name">Dong Xu</p>
+          <p class="site-description motion-element" itemprop="description">Ideas worth spreading and sharing...</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">38</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-背景说明"><span class="nav-number">1.</span> <span class="nav-text">1 背景说明</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-实际应用场景说明"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 实际应用场景说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-为什么需要特征交叉"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 为什么需要特征交叉</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-FM模型原理"><span class="nav-number">2.</span> <span class="nav-text">2 FM模型原理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-从二阶多项式模型到FM模型"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 从二阶多项式模型到FM模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-FM模型原理"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 FM模型原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-FM参数学习过程"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 FM参数学习过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-4-模型计算复杂度"><span class="nav-number">2.4.</span> <span class="nav-text">2.4 模型计算复杂度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-5-FM模型总结"><span class="nav-number">2.5.</span> <span class="nav-text">2.5 FM模型总结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-FFM模型原理"><span class="nav-number">3.</span> <span class="nav-text">3 FFM模型原理</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Dong Xu</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"xdrush"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="custom_mathjax_source">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

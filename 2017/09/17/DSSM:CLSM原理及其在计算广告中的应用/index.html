@@ -1,0 +1,902 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="自然语言处理," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="背景说明在搜索广告或者信息流中融入搜索广告时，通常我们需要对关键词进行行业标注，目的是为了方便在某些特殊渠道或者特定场景下对某些行业进行屏蔽。比如，在信息流广告中，通常是看不到医疗类广告的身影，这是因为在大部分信息流广告中，为了用户体验，而选择性的将医疗类广告做了屏蔽；然而，医疗类广告在搜索广告收入中的占比依然很大；另一种场景是，在某个特定的时间，应某些方面的强制需求，不允许出现某行业相关的广告，">
+<meta name="keywords" content="自然语言处理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DSSM&#x2F;CLSM原理及其在计算广告中的应用">
+<meta property="og:url" content="https://xdrush.github.io/2017/09/17/DSSM:CLSM原理及其在计算广告中的应用/index.html">
+<meta property="og:site_name" content="XDRush">
+<meta property="og:description" content="背景说明在搜索广告或者信息流中融入搜索广告时，通常我们需要对关键词进行行业标注，目的是为了方便在某些特殊渠道或者特定场景下对某些行业进行屏蔽。比如，在信息流广告中，通常是看不到医疗类广告的身影，这是因为在大部分信息流广告中，为了用户体验，而选择性的将医疗类广告做了屏蔽；然而，医疗类广告在搜索广告收入中的占比依然很大；另一种场景是，在某个特定的时间，应某些方面的强制需求，不允许出现某行业相关的广告，">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/dssm%E7%BB%93%E6%9E%84001.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/dnn_structure.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/cosine_distance.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/dssm_prediction.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/loss_function.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/dssm_initializer01.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/dssm_initializer02.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/letter-n_gram.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/clsm_model_structure.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/dssm_prediction.png">
+<meta property="og:image" content="http://7xtapc.com2.z0.glb.clouddn.com/loss_function.png">
+<meta property="og:updated_time" content="2017-12-16T03:01:49.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="DSSM&#x2F;CLSM原理及其在计算广告中的应用">
+<meta name="twitter:description" content="背景说明在搜索广告或者信息流中融入搜索广告时，通常我们需要对关键词进行行业标注，目的是为了方便在某些特殊渠道或者特定场景下对某些行业进行屏蔽。比如，在信息流广告中，通常是看不到医疗类广告的身影，这是因为在大部分信息流广告中，为了用户体验，而选择性的将医疗类广告做了屏蔽；然而，医疗类广告在搜索广告收入中的占比依然很大；另一种场景是，在某个特定的时间，应某些方面的强制需求，不允许出现某行业相关的广告，">
+<meta name="twitter:image" content="http://7xtapc.com2.z0.glb.clouddn.com/dssm%E7%BB%93%E6%9E%84001.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xdrush.github.io/2017/09/17/DSSM:CLSM原理及其在计算广告中的应用/"/>
+
+
+
+
+
+  <title> DSSM/CLSM原理及其在计算广告中的应用 | XDRush </title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">XDRush</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle">Ideas worth spreading and sharing...</p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="https://xdrush.github.io/2017/09/17/DSSM:CLSM原理及其在计算广告中的应用/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Dong Xu">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xtapc.com2.z0.glb.clouddn.com/mywebsite_icon.JPG">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="XDRush">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="XDRush" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                DSSM/CLSM原理及其在计算广告中的应用
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-17T17:05:39+08:00">
+                2017-09-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/09/17/DSSM:CLSM原理及其在计算广告中的应用/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/09/17/DSSM:CLSM原理及其在计算广告中的应用/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="背景说明"><a href="#背景说明" class="headerlink" title="背景说明"></a>背景说明</h1><p>在搜索广告或者信息流中融入搜索广告时，通常我们需要对关键词进行行业标注，目的是为了方便在某些特殊渠道或者特定场景下对某些行业进行屏蔽。比如，在信息流广告中，通常是看不到医疗类广告的身影，这是因为在大部分信息流广告中，为了用户体验，而选择性的将医疗类广告做了屏蔽；然而，医疗类广告在搜索广告收入中的占比依然很大；另一种场景是，在某个特定的时间，应某些方面的强制需求，不允许出现某行业相关的广告，比如在19大期间，应上面要求，信息流中不允许出现棋类赌博类广告，大家都知道棋牌类广告的CPC通常都很高，消耗占比通常也很高；</p>
+<a id="more"></a>
+<p>因此，要做到实时响应各方需求，最好的做法是对广告主购买的关键词进行行业标注；标注示例如下：<br>| 关键词    | 行业  |<br>| ———-   | ———: |<br>| 专升本有哪些学校 | 教育/其他 |<br>| 注册会计师报名条件 | 教育/从业资格 |<br>| 美国留学咨询 | 教育/出国留学 |</p>
+<p>上表中，行业那一列一般根据业务需要可分为一级行业和二级行业，上例中，教育为一级行业，其他、从业资格和出国留学，是二级行业，具体分为几级行业，视具体业务场景而定。</p>
+<p>那么，如何对大规模关键词进行行业标注呢？人工标注显然不现实（通常数据规模几万到几十万不等），文本分类模型的引入是必然的。现阶段，我们的文本分类模型是基于分层贝叶斯思想，用的是15年左右根据当前的业务场景训练出来的，模型有两年多没有更新了，随着新的关键词的而引入，分类准确率必定会越来越低。事实证明，15年左右模型的分类准确率在95%左右，目前只有80%左右。</p>
+<p>后面我将会讲解一系列文本分类方法，结合具体的应用场景来解决这个问题。</p>
+<h1 id="DSSM"><a href="#DSSM" class="headerlink" title="DSSM"></a>DSSM</h1><p>DSSM来自于这篇文章(Learning Deep Structured Semantic Models for Web Search using Clickthrough Data)，13年由Microsoft的Xiaodong He提出（后面这个团队还提出了Sentence2Vector模型），据目前所知，DSSM目前在Baidu和Alibaba的NLP业务中，都有其应用地方。这里就剖析下DSSM的原理及思想。</p>
+<h2 id="DSSM提出背景"><a href="#DSSM提出背景" class="headerlink" title="DSSM提出背景"></a>DSSM提出背景</h2><p>DSSM最开始提出的应用场景是搜索排序中，当用户输入一个关键词query是，如何按序展示搜索结果？DSSM提出的正是为了解决这个问题。将某个query被点击的document当做正样本，展示了却未被点击的document当做负样本，通过这些训练数据，来预测某个query被点击的可能性。</p>
+<h2 id="DSSM模型结构"><a href="#DSSM模型结构" class="headerlink" title="DSSM模型结构"></a>DSSM模型结构</h2><p>DSSM模型的整体结构如下图：<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/dssm%E7%BB%93%E6%9E%84001.png" alt="DSSM结构"><br>上图中，Q表示查询词query，D(i)表示搜索结构对应的document，一个query对应多个document，D(i)(i = 1, 2, …, n)中有一个被点击的正样本，其他的都是负样本。</p>
+<p>基本思想是将query和每个document都经过相同的网络结构，然后计算query和每个document的relevance，这里的relevance采用余弦距离计算方法，得到query和每个document的relevance之后，再经过带系数的softmax，从而得到query和每个document的相关score，最终document依据score进行排序；</p>
+<h3 id="网络结构"><a href="#网络结构" class="headerlink" title="网络结构"></a>网络结构</h3><p>query和每个document都经过相同的网络结构，DNN每一层的处理如下式：<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/dnn_structure.png" alt="每一层的处理"><br>其中f(x)采用的是tanh激活函数。</p>
+<h3 id="相关性计算"><a href="#相关性计算" class="headerlink" title="相关性计算"></a>相关性计算</h3><p>query和每个document经过网络得到128维的输出结构之后，计算query和每个document的余弦距离：<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/cosine_distance.png" alt="相关性计算"><br>y(Q)和y(D)分别表示query和每个document经过DNN之后的输出。</p>
+<h3 id="结果预测"><a href="#结果预测" class="headerlink" title="结果预测"></a>结果预测</h3><p>得到余弦距离还不是最终的结果，最终得要转化为每个document的得分，很容易想到softmax，本文也正是这么做的，不过在计算softmax值时引入了平滑因子：<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/dssm_prediction.png" alt="计算最终得分"><br>上式中r即为引入的平滑因子，r是经验值，视具体应用场景而定，不是超参数。</p>
+<h3 id="损失函数"><a href="#损失函数" class="headerlink" title="损失函数"></a>损失函数</h3><p>训练时，DSSM通过最大化正样本的被点击的概率来实现学习过程，参数更新采用SGD算法。<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/loss_function.png" alt=""></p>
+<h3 id="超参数初始化方式"><a href="#超参数初始化方式" class="headerlink" title="超参数初始化方式"></a>超参数初始化方式</h3><p>本文中超参数的初始化方式比较经典，值得借用：<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/dssm_initializer01.png" alt="W超参数初始化"><br><img src="http://7xtapc.com2.z0.glb.clouddn.com/dssm_initializer02.png" alt="W超参数初始化"><br>DNN的超参数初始化为上面值范围内的均匀分布，不太记得是哪篇paper中有详细论述这种初始化方式能较快的收敛。</p>
+<h3 id="其他实现细节"><a href="#其他实现细节" class="headerlink" title="其他实现细节"></a>其他实现细节</h3><p>在构造训练数据时，为实现数据对齐，每个query只有1个被点击的document作为正样本，4个未被点击的document作为负样本。</p>
+<h2 id="Word-Hashing"><a href="#Word-Hashing" class="headerlink" title="Word Hashing"></a>Word Hashing</h2><p>Word Hashing是本文提出的一个关键方法：该方法通过将每一个word处理成letter-n gram维度的表示来实现降维的目的。其核心思想如下：</p>
+<p>考虑单个word，以good为例，如果采用one-hot表示，那么每个word的维度将会非常大，假设训练样本有500k个独立的单词，那么每个word的one-hot也会是500k维，计算复杂度比较高。本文提出基于letter-n gram维度的词表示，首先为每个word加上开始和结束标志（good表示为#good#），以letter-3为例，将#good#进一步表示为#go，goo，ood，od#，最终将word用letter-n的vector来表示；具体的实现方式在下一篇文章中可以获知：<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/letter-n_gram.png" alt="letter-n gram表示"><br>以上图为例，#bo，boy，oy#是one-hot表示，但是整个boy的vector是这三个的和，因此boy是multi-hot表示。每个query和document由多个word组成，其对应的vector也是若干个word的和表示。</p>
+<p>作者表示，英文单词的个数可以是无限多个，但是letter-n的总个数却是比较固定的，并且个数比较少；据作者统计，500k个词汇，最终可以用30k个letter-n来表示，并且冲突率只有0.0044%（22/500k）。</p>
+<h2 id="存在的问题"><a href="#存在的问题" class="headerlink" title="存在的问题"></a>存在的问题</h2><p>通过上面的分析，我们不难发现，DSSM通过求和的方式显然丢失了word与word之间的上下文信息。紧接着，下文就产生了！</p>
+<h1 id="CLSM"><a href="#CLSM" class="headerlink" title="CLSM"></a>CLSM</h1><p>讲完了DSSM，就不得不提CLSM（A Latent Semantic Model with Convolutional-Pooling Structure for Information Retrieval），源自于同一个团队，要解决的问题也是相同的，CLSM不同于DSSM的地方主要在于以下两个方面：</p>
+<ul>
+<li>引入了CNN；</li>
+<li>考虑了context上下文信息；<br>那么CLSM是如何做的呢？</li>
+</ul>
+<h2 id="CLSM模型结构"><a href="#CLSM模型结构" class="headerlink" title="CLSM模型结构"></a>CLSM模型结构</h2><p>CLSM模型采用的结构如下：<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/clsm_model_structure.png" alt=""></p>
+<h3 id="word-n-gram"><a href="#word-n-gram" class="headerlink" title="word-n gram"></a>word-n gram</h3><p>从上图可知，clsm首先对输入通过一个滑动窗口的形式取n个连续的word（本例中n=3），正是这种word-n gram，考虑了每个word前后的信息，因此就保留了上下文信息。</p>
+<h3 id="letter-n-gram"><a href="#letter-n-gram" class="headerlink" title="letter-n gram"></a>letter-n gram</h3><p>针对每个word，采用了同DSSM中类似的处理方法：采用letter-n gram来获取每个word的vector，再将一个窗口内的n个word拼接成n*30k的向量表示，拼接也保留了上下文信息；</p>
+<h3 id="卷积层"><a href="#卷积层" class="headerlink" title="卷积层"></a>卷积层</h3><p>从letter-trigram到convolutional layer，用CNN实现，将维度从90k降到300，抽取更高维和更抽象的表示；</p>
+<h3 id="Max-Pooling"><a href="#Max-Pooling" class="headerlink" title="Max-Pooling"></a>Max-Pooling</h3><p>经过卷积层后，通常情况下，由于输入的query或者document长度不一致，因此卷积层的长度肯定也各不相同，Max-Pooling抽取300维对应下标的最大值，最终组成一个300维的向量，然后再经过一个神经网络得到最终的128维向量表达。以上的激活函数都是tanh。</p>
+<h3 id="结果预测-1"><a href="#结果预测-1" class="headerlink" title="结果预测"></a>结果预测</h3><p>CLSM的结果预测同DSSM一样，<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/dssm_prediction.png" alt="计算最终得分"></p>
+<h3 id="损失函数-1"><a href="#损失函数-1" class="headerlink" title="损失函数"></a>损失函数</h3><p>损失函数也跟DSSM一样：<br><img src="http://7xtapc.com2.z0.glb.clouddn.com/loss_function.png" alt=""></p>
+<p>以上便是对DSSM和CLSM的理解，DSSM/CLSM提出的初衷是解决搜索中的文档排序问题，但是也可以延伸到计算广告中。</p>
+<h1 id="DSSM-CLSM在计算广告中的应用"><a href="#DSSM-CLSM在计算广告中的应用" class="headerlink" title="DSSM/CLSM在计算广告中的应用"></a>DSSM/CLSM在计算广告中的应用</h1><p>据同事了解，DSSM/CLSM已经广告应用在百度和阿里的广告业务场景中，在我们的应用场景中，主要有以下几个方面可以借鉴：</p>
+<h2 id="搜索广告关键词相关性"><a href="#搜索广告关键词相关性" class="headerlink" title="搜索广告关键词相关性"></a>搜索广告关键词相关性</h2><p>在搜索广告中，通常一个关键词被多个广告主购买，因此每个关键词就会对应多组创意，怎样根据关键词召回最合理的广告？DSSM/CLSM提供了一种思路：根据每个关键的历史click和pv，结合context和ad，对每个创意进行打分，可以实现类似于CTR预估的功能。</p>
+<h2 id="文本分类问题"><a href="#文本分类问题" class="headerlink" title="文本分类问题"></a>文本分类问题</h2><p>正如本文最开始所提出的问题，在对关键词进行行业分类时，每个关键词对应于一个正确的分类，可以随机挑选多个不正确的分类当做训练数据，当然这只是一种思路，行不行得要试验才知道。</p>
+<h2 id="广告创意优化"><a href="#广告创意优化" class="headerlink" title="广告创意优化"></a>广告创意优化</h2><p>在信息流广告或者搜索广告中，每个关键词一般有多个标题，那么如何在这么多标题候选集中选择相关的标题呢？用传统的word2vector当然能够实现一个baseline，我们组之前一直都是这么做的，但是在PM审核关键词标题相关性时，一般过审率不高。在用关键词配标题的业务场景中，基于已有的关键词-标题对可以很好将CLSM利用起来。这也不失为一种物料优化的思路。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/自然语言处理/" rel="tag"># 自然语言处理</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/09/局部敏感哈希/" rel="next" title="局部敏感哈希算法原理及其应用">
+                <i class="fa fa-chevron-left"></i> 局部敏感哈希算法原理及其应用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/10/23/Attention机制及其在计算广告中的应用/" rel="prev" title="Attention机制及其在计算广告中的应用">
+                Attention机制及其在计算广告中的应用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/09/17/DSSM:CLSM原理及其在计算广告中的应用/"
+           data-title="DSSM/CLSM原理及其在计算广告中的应用" data-url="https://xdrush.github.io/2017/09/17/DSSM:CLSM原理及其在计算广告中的应用/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xtapc.com2.z0.glb.clouddn.com/mywebsite_icon.JPG"
+               alt="Dong Xu" />
+          <p class="site-author-name" itemprop="name">Dong Xu</p>
+          <p class="site-description motion-element" itemprop="description">Ideas worth spreading and sharing...</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">38</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#背景说明"><span class="nav-number">1.</span> <span class="nav-text">背景说明</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#DSSM"><span class="nav-number">2.</span> <span class="nav-text">DSSM</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#DSSM提出背景"><span class="nav-number">2.1.</span> <span class="nav-text">DSSM提出背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DSSM模型结构"><span class="nav-number">2.2.</span> <span class="nav-text">DSSM模型结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#网络结构"><span class="nav-number">2.2.1.</span> <span class="nav-text">网络结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#相关性计算"><span class="nav-number">2.2.2.</span> <span class="nav-text">相关性计算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#结果预测"><span class="nav-number">2.2.3.</span> <span class="nav-text">结果预测</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#损失函数"><span class="nav-number">2.2.4.</span> <span class="nav-text">损失函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#超参数初始化方式"><span class="nav-number">2.2.5.</span> <span class="nav-text">超参数初始化方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他实现细节"><span class="nav-number">2.2.6.</span> <span class="nav-text">其他实现细节</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Word-Hashing"><span class="nav-number">2.3.</span> <span class="nav-text">Word Hashing</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#存在的问题"><span class="nav-number">2.4.</span> <span class="nav-text">存在的问题</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CLSM"><span class="nav-number">3.</span> <span class="nav-text">CLSM</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#CLSM模型结构"><span class="nav-number">3.1.</span> <span class="nav-text">CLSM模型结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#word-n-gram"><span class="nav-number">3.1.1.</span> <span class="nav-text">word-n gram</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#letter-n-gram"><span class="nav-number">3.1.2.</span> <span class="nav-text">letter-n gram</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#卷积层"><span class="nav-number">3.1.3.</span> <span class="nav-text">卷积层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Max-Pooling"><span class="nav-number">3.1.4.</span> <span class="nav-text">Max-Pooling</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#结果预测-1"><span class="nav-number">3.1.5.</span> <span class="nav-text">结果预测</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#损失函数-1"><span class="nav-number">3.1.6.</span> <span class="nav-text">损失函数</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#DSSM-CLSM在计算广告中的应用"><span class="nav-number">4.</span> <span class="nav-text">DSSM/CLSM在计算广告中的应用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#搜索广告关键词相关性"><span class="nav-number">4.1.</span> <span class="nav-text">搜索广告关键词相关性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文本分类问题"><span class="nav-number">4.2.</span> <span class="nav-text">文本分类问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#广告创意优化"><span class="nav-number">4.3.</span> <span class="nav-text">广告创意优化</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Dong Xu</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"xdrush"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="custom_mathjax_source">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
